@@ -19,7 +19,7 @@ public class LibrarySystemDB implements AccessCredentials{
             System.out.println("Connected successfully.");
         }
         catch (SQLException | ClassNotFoundException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
