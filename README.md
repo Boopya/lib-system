@@ -30,7 +30,7 @@ Connecting the database to Netbeans project
   7. Wait for a new database to pop-up. It must be something like "jdbc:oracle:thin:@localhost:1521:libsysdb"
   8. Right-click on it, then click Connect using the username and password (okichinko)
   
-  Create new project
-    1. Create a new project "Library System"
-    2. Copy the java files in this repository
-    3. Run the file to test connection
+Create new project
+  1. Create a new project "Library System"
+  2. Copy the java files in this repository
+  3. Run the file to test connection
