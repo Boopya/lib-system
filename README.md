@@ -1,4 +1,4 @@
-## Creating the database
+Creating the database
   1. Setup a database, using the Database Configuration Assistant. You can search it in the search box of Windows.
   2. Click next
   3. Choose "Create a database" and click next
@@ -20,7 +20,7 @@
   19. You should see the LIBSYSDB under the Oracle connections now. Double click on it, and type in "okichinko" for both username and password.
   20. You should be successfully connected to the database now.
 
-## Connecting the database to Netbeans project
+Connecting the database to Netbeans project
   1. Download ojdbc6.jar
   2. Open Netbeans
   3. From menu bar, click Windows > Services
@@ -30,7 +30,7 @@
   7. Wait for a new database to pop-up. It must be something like "jdbc:oracle:thin:@localhost:1521:libsysdb"
   8. Right-click on it, then click Connect using the username and password (okichinko)
   
-## Create new project
+Create new project
   1. Create a new project "Library System"
   2. Copy the java files in this repository
   3. Run the file to test connection

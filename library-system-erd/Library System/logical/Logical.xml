@@ -1,7 +1,0 @@
-<?xml version = '1.0' encoding = 'UTF-8'?>
-<LogicalDesign class="oracle.dbtools.crest.model.design.logical.LogicalDesign" name="Logical" id="56B92D71-4EF3-05EF-9B15-DCD193D58CEA" mainViewID="A5B719B6-DF7E-BD8E-950C-688BCB2FFAF7">
-<createdBy>ELIO</createdBy>
-<createdTime>2020-01-18 05:27:56 UTC</createdTime>
-<ownerDesignName>Library System v2</ownerDesignName>
-<shouldBeOpen>false</shouldBeOpen>
-</LogicalDesign>
