@@ -111,7 +111,7 @@ CREATE OR REPLACE PROCEDURE update_user_penalty (
     p_amount patron.unpaidfine%type ) IS
 BEGIN
     UPDATE patron SET
-        unpaidfine = p_amount
+        unpaidfine = unpaidfine + p_amount
     WHERE loginid = p_loginid;
 END update_user_penalty;
 
