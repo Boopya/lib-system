@@ -22,6 +22,7 @@ BEGIN
         user_city,
         user_unpaid);
 END add_user;
+/
 
 CREATE OR REPLACE PROCEDURE edit_user (
     old_user_id patron.loginid%type,
@@ -49,12 +50,14 @@ BEGIN
         unpaidfine = user_unpaid
     WHERE loginid = old_user_id;
 END edit_user;
+/
 
 CREATE OR REPLACE PROCEDURE delete_user ( 
     user_id patron.loginid%type ) IS
 BEGIN
     DELETE FROM patron WHERE loginid = user_id;
 END delete_user;
+/
 
 CREATE OR REPLACE PROCEDURE add_book (
     p_isbn book.isbn%type,
@@ -74,6 +77,7 @@ BEGIN
         p_statusdate,
         p_shelfid);
 END add_book;
+/
 
 CREATE OR REPLACE PROCEDURE edit_book (
     old_isbn book.isbn%type,
@@ -97,6 +101,7 @@ BEGIN
     WHERE isbn = old_isbn AND 
           copynumber = old_cpnum;
 END edit_book;
+/
 
 CREATE OR REPLACE PROCEDURE delete_book (
     p_isbn book.isbn%type,
@@ -105,6 +110,7 @@ BEGIN
     DELETE FROM book 
         WHERE isbn = p_isbn AND copynumber = p_cpnum;
 END delete_book;
+/
 
 CREATE OR REPLACE PROCEDURE update_user_penalty (
     p_loginid patron.loginid%type,
@@ -114,6 +120,7 @@ BEGIN
         unpaidfine = unpaidfine + p_amount
     WHERE loginid = p_loginid;
 END update_user_penalty;
+/
 
 CREATE OR REPLACE PROCEDURE update_book_status (
     p_isbn book.isbn%type,
@@ -127,6 +134,7 @@ BEGIN
     WHERE isbn = p_isbn AND 
           copynumber = p_cpnum;
 END update_book_status;
+/
 
 CREATE OR REPLACE PROCEDURE add_transaction (
     p_transid transaction.transactionid%type,
@@ -144,6 +152,7 @@ BEGIN
         p_isbn,
         p_cpnum);
 END add_transaction;
+/
 
 CREATE OR REPLACE PROCEDURE loan_book (
     p_transid transaction.transactionid%type,
@@ -155,6 +164,7 @@ BEGIN
     add_transaction(p_transid,p_transdate,'LOAN',p_loginid,p_isbn,p_cpnum);
     update_book_status(p_isbn,p_cpnum,'ON-LOAN',p_transdate);
 END loan_book;
+/
 
 CREATE OR REPLACE PROCEDURE return_book (
     p_transid transaction.transactionid%type,
@@ -180,3 +190,4 @@ BEGIN
     
     update_book_status(p_isbn,p_cpnum,'ON-SHELF',p_transdate);
 END return_book;
+/
