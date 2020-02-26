@@ -17,9 +17,9 @@ ALTER TABLE patron ADD CONSTRAINT patron_pk PRIMARY KEY ( loginid );
 
 -- LIBRARIAN --
 CREATE TABLE librarian (
-    loginid                NUMBER(25) NOT NULL,
-    bookaccesspermission   VARCHAR2(20) NOT NULL,
-    useraccesspermission   VARCHAR2(20) NOT NULL
+    loginid      NUMBER(25) NOT NULL,
+    bookaccess   VARCHAR2(3) NOT NULL,
+    useraccess   VARCHAR2(3) NOT NULL
 );
 
 ALTER TABLE librarian ADD CONSTRAINT librarian_pk PRIMARY KEY ( loginid );
@@ -28,6 +28,13 @@ ALTER TABLE librarian
     ADD CONSTRAINT librarian_patron_fk FOREIGN KEY ( loginid )
         REFERENCES patron ( loginid );
         
+ALTER TABLE librarian 
+    ADD CONSTRAINT check_bookaccess CHECK ( bookaccess IN
+        ( '111','110','100','000','001','011','010','101' ));
+        
+ALTER TABLE librarian 
+    ADD CONSTRAINT check_useraccess CHECK ( useraccess IN
+        ( '111','110','100','000','001','011','010','101' ));
         
 -- BOOK --
 CREATE TABLE book (
@@ -69,15 +76,16 @@ ALTER TABLE shelf ADD CONSTRAINT shelf_pk PRIMARY KEY ( shelfid );
 
 -- TRANSACTION --
 CREATE TABLE transaction (
+    transactionid     NUMBER(50) NOT NULL,
+    transactiondate   DATE NOT NULL,
+    transactionmode   VARCHAR2(20) NOT NULL,
     patron_loginid    NUMBER(25) NOT NULL,
     book_isbn         NUMBER(13) NOT NULL,
     book_copynumber   NUMBER(3) NOT NULL
 );
 
 ALTER TABLE transaction
-    ADD CONSTRAINT transaction_pk PRIMARY KEY ( patron_loginid,
-                                                book_isbn,
-                                                book_copynumber );
+    ADD CONSTRAINT transaction_pk PRIMARY KEY ( transactionid );
 
 ALTER TABLE transaction
     ADD CONSTRAINT transaction_book_fk FOREIGN KEY ( book_isbn,
