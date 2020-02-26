@@ -1,0 +1,136 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="6D3A0707-AB00-1890-DE47-C8769AB5E29F" name="User">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>5616AE9A-74AF-722C-5657-5DCECD1004CF</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="LoginID" id="D7476775-AD4E-2E9E-6BE1-2FC3A3EE8104">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>4900452B-7750-D69C-C0C5-6DE3B1AF2017</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>50</dataTypePrecision>
+<ownDataTypeParameters>,50,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FirstName" id="85A69329-4279-4190-8D3A-8835DDE9C8ED">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>6408D682-55AC-7270-ED4E-6D358F9988F3</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MiddleName" id="2CCF06EB-E15E-3743-4314-F8E7F30D66AE">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>82979309-CBBB-93EF-33E0-6533E599BA62</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LastName" id="917C6AD3-7C4B-5472-2200-03EDBB939F54">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>660D644E-05BB-9B1D-77EF-B97F890BB485</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Password" id="93ADA461-359D-6828-7BBB-947C266AF109">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>9CF95088-679C-D8F2-13CB-1275FEAB0FC9</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50</dataTypeSize>
+<ownDataTypeParameters>50,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Address(HouseNo)" id="EB4C9E7A-DE73-F35A-467E-0FA4CBD76B7D">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>842193D9-F001-D65A-1301-73FAAFAFA5C8</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>10</dataTypeSize>
+<ownDataTypeParameters>10,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Address(Street)" id="1EE62D28-F075-84B8-AC9E-9DC0FDDD4B46">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>F1627AC8-42BD-2DC7-450D-2F848BFB69C2</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Address(Barangay)" id="515A0ACF-9C87-9338-649A-8513D9BD9B5D">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>D6E0ED66-3D64-142C-AA34-98CAE850D235</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Address(City)" id="A5605D12-5FE7-17E3-C281-ABDF68552943">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>EA48E2E9-76BD-FBCF-532D-D02FCD0CF48F</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="B3B9BC64-DC96-69D7-70A2-B9A3CA5FD9C6" name="User_PK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>912ABBFE-7A94-8E21-67AC-0A3E00D99A7C</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D7476775-AD4E-2E9E-6BE1-2FC3A3EE8104"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="F45496DF-9DBB-4495-9140-533CFBE7BF20" containerWithKeyObject="FD2183C5-3EFD-6F64-918F-61846181D4E4" localFKIndex="9840B2B5-B660-D7E0-E88A-504DF3746F51" name="Transaction_Patron_FK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:40:39 UTC</createdTime>
+<generatorID>CDA1B6B7-9F3F-4FC8-22CD-1B4AC650E942</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<referredTableLongName>Patron</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>891BFADA-0A68-740C-0C13-CA1E95A01343</referredTableID>
+<keyObject>6460695B-8AEC-FC69-4C44-E6B54C87C6C1</keyObject>
+<referredKeyID>6460695B-8AEC-FC69-4C44-E6B54C87C6C1</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>LoginID</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

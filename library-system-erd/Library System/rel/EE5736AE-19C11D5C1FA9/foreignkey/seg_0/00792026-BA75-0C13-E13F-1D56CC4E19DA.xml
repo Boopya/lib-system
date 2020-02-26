@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="00792026-BA75-0C13-E13F-1D56CC4E19DA" containerWithKeyObject="91444C8A-7397-FEB4-02BB-17239AEF15DD" localFKIndex="95187D57-A5B6-9DC2-7070-692EF4332EA7" name="Book_Shelf_FK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 06:22:14 UTC</createdTime>
+<generatorID>63D2BCEF-FCE8-CADA-2A20-A54C84C97DC6</generatorID>
+<ownerDesignName>Library System</ownerDesignName>
+<referredTableLongName>Shelf</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>951320E5-324D-73BA-3662-77F0AC8022FE</referredTableID>
+<keyObject>9DD86666-D1BB-F9EC-D492-407B7C31BE13</keyObject>
+<referredKeyID>9DD86666-D1BB-F9EC-D492-407B7C31BE13</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>ShelfID</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

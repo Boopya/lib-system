@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="Transaction" directorySegmentName="seg_0" id="CDA1B6B7-9F3F-4FC8-22CD-1B4AC650E942">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 06:52:29 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="761F083D-461D-04A4-A317-A9238429150C" value="true"/>
+<item key="F1DD6CAC-72C7-06EE-1C2E-FCBCE085EEC0" value="true"/>
+<item key="144D4B26-659C-6EA0-E431-C19B17DB9BDD" value="true"/>
+</engineerTo>
+<identifying>false</identifying>
+<optionalSource>false</optionalSource>
+<optionalTarget>true</optionalTarget>
+<sourceCardinality>*</sourceCardinality>
+<sourceEntity>5616AE9A-74AF-722C-5657-5DCECD1004CF</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>776512F3-4E23-F8B3-8D19-0DF02F174462</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

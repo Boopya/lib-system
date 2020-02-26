@@ -1,0 +1,108 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="13926F32-9DC1-F27B-0088-C5BE4BF28604" name="Transaction">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 07:47:33 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="TransactionID" id="6B3FAFBB-B265-C861-F8A5-C1B85C023A0D">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:01:53 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>100</dataTypePrecision>
+<ownDataTypeParameters>,100,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="TransactionDate" id="8169C595-5FDF-ED3C-71D6-DB0E5BE99F12">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 07:49:11 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="TransactionMode" id="5DF3A532-3C56-2A9E-3B70-140F3D4BF09E">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 07:58:54 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LoginID" id="5EA49BEA-0E4E-CD2F-4D15-70A512794B56">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 07:47:33 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>50</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="8B5D7523-BA72-954D-99E1-26E5058E5879" referredColumn="96F8EF75-9896-77E1-7943-82AAED414986"/>
+</associations>
+</Column>
+<Column name="ISBN" id="79E96E97-4E63-9CD8-332D-47A2D173DBF5">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 07:47:33 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>13</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="17C34701-649C-DA1B-9B35-0F32C4C810D8" referredColumn="86714245-90C8-22D1-0FD6-C2ADA58B40AF"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="33216081-E5B6-1ACA-5638-312BE341D50D" name="Transaction_PK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 07:47:33 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6B3FAFBB-B265-C861-F8A5-C1B85C023A0D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C8987DCD-DCB6-9898-C10C-45E756F58994" name="Transaction_Patron_FK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 07:47:33 UTC</createdTime>
+<generatorID>CDA1B6B7-9F3F-4FC8-22CD-1B4AC650E942</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5EA49BEA-0E4E-CD2F-4D15-70A512794B56"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="0B50DD63-967B-CAA0-6AE7-7886041974D2" name="Transaction_Book_FK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 07:47:33 UTC</createdTime>
+<generatorID>CDA1B6B7-9F3F-4FC8-22CD-1B4AC650E942</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="79E96E97-4E63-9CD8-332D-47A2D173DBF5"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

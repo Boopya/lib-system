@@ -1,0 +1,52 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="CE9BBFC7-5CC8-AE41-3C3A-C91347E79F14" name="Librarian">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 05:34:18 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="761F083D-461D-04A4-A317-A9238429150C" value="true"/>
+<item key="F1DD6CAC-72C7-06EE-1C2E-FCBCE085EEC0" value="true"/>
+<item key="144D4B26-659C-6EA0-E431-C19B17DB9BDD" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<hierarchicalParent>5616AE9A-74AF-722C-5657-5DCECD1004CF</hierarchicalParent>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="BookAccessPermission" id="833C7D54-2160-34CE-5754-120B61F8FAF5">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 05:42:32 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="761F083D-461D-04A4-A317-A9238429150C" value="true"/>
+<item key="F1DD6CAC-72C7-06EE-1C2E-FCBCE085EEC0" value="true"/>
+<item key="144D4B26-659C-6EA0-E431-C19B17DB9BDD" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="UserAccessPermission" id="D93C24E9-F5F1-EB88-E3F6-E52FAD81E041">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-02-22 07:00:13 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="761F083D-461D-04A4-A317-A9238429150C" value="true"/>
+<item key="F1DD6CAC-72C7-06EE-1C2E-FCBCE085EEC0" value="true"/>
+<item key="144D4B26-659C-6EA0-E431-C19B17DB9BDD" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+</Entity>
