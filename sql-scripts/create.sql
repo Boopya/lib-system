@@ -81,7 +81,7 @@ ALTER TABLE shelf ADD CONSTRAINT shelf_pk PRIMARY KEY ( shelfid );
 
 -- TRANSACTION --
 CREATE TABLE transaction (
-    transactionid     NUMBER(50) NOT NULL,
+    transactionid     NUMBER(30) NOT NULL,
     transactiondate   DATE NOT NULL,
     transactionmode   VARCHAR2(20) NOT NULL,
     patron_loginid    NUMBER(25) NOT NULL,
