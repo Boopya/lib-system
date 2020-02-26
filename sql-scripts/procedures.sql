@@ -1,3 +1,4 @@
+-- USER GENERAL PROCEDURES --
 CREATE OR REPLACE PROCEDURE add_user (
     user_id patron.loginid%type,
     user_fname patron.firstname%type,
@@ -59,6 +60,7 @@ BEGIN
 END delete_user;
 /
 
+-- BOOK GENERAL PROCEDURES --
 CREATE OR REPLACE PROCEDURE add_book (
     p_isbn book.isbn%type,
     p_cpnum book.copynumber%type,
@@ -112,6 +114,7 @@ BEGIN
 END delete_book;
 /
 
+-- LOAN/RETURN/RESERVE HELPER PROCEDURES --
 CREATE OR REPLACE PROCEDURE update_user_penalty (
     p_loginid patron.loginid%type,
     p_amount patron.unpaidfine%type ) IS
@@ -136,6 +139,7 @@ BEGIN
 END update_book_status;
 /
 
+-- TRANSACTION CREATION PROCEDURE --
 CREATE OR REPLACE PROCEDURE add_transaction (
     p_transid transaction.transactionid%type,
     p_transdate transaction.transactiondate%type,
@@ -154,6 +158,12 @@ BEGIN
 END add_transaction;
 /
 
+-- LOAN BOOK PROCEDURE --
+/*
+    - add a transaction instance with 'LOAN' transactionmode
+    - update the current status of the loaned book into 'ON-LOAN' status
+    NOTE: no implemented exceptions for special cases
+*/
 CREATE OR REPLACE PROCEDURE loan_book (
     p_transid transaction.transactionid%type,
     p_transdate transaction.transactiondate%type,
@@ -166,6 +176,13 @@ BEGIN
 END loan_book;
 /
 
+-- RETURN BOOK PROCEDURE --
+/*
+    - add a transaction instance with 'RETURN' transactionmode
+    - determine the loan interval of the user
+    - update the unpaidfine by incrementing the computed penaltycost
+    NOTE: no implemented exceptions for special cases
+*/
 CREATE OR REPLACE PROCEDURE return_book (
     p_transid transaction.transactionid%type,
     p_transdate transaction.transactiondate%type,
