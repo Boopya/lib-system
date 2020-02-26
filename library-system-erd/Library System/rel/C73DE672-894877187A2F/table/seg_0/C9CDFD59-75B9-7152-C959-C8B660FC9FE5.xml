@@ -1,0 +1,149 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="C9CDFD59-75B9-7152-C959-C8B660FC9FE5" name="Patron">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>5616AE9A-74AF-722C-5657-5DCECD1004CF</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="LoginID" id="28ADB55A-A54E-2C52-C4F2-1EC13A87CD81">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>4900452B-7750-D69C-C0C5-6DE3B1AF2017</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>25</dataTypePrecision>
+<ownDataTypeParameters>,25,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FirstName" id="BD23EACE-8A1F-6BCD-0E9D-8B986E30854E">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>6408D682-55AC-7270-ED4E-6D358F9988F3</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MiddleName" id="EE39CF35-8AA9-8D56-6C93-8CF55E49F578">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>82979309-CBBB-93EF-33E0-6533E599BA62</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LastName" id="9876E0CA-FD82-1E5F-BAA7-53285C2F4326">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>660D644E-05BB-9B1D-77EF-B97F890BB485</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Password" id="3FDAC7C6-5982-587D-5137-3BACDCB5FB3D">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>9CF95088-679C-D8F2-13CB-1275FEAB0FC9</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50</dataTypeSize>
+<ownDataTypeParameters>50,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="HouseNo" id="ECC747EF-98B0-F028-06EE-2ACF417F66B5">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>842193D9-F001-D65A-1301-73FAAFAFA5C8</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>10</dataTypeSize>
+<ownDataTypeParameters>10,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Street" id="0F89C46A-4626-02CE-057D-89C4E9B6005C">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>F1627AC8-42BD-2DC7-450D-2F848BFB69C2</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Barangay" id="227EDB67-68BF-BA6B-6B1F-038893474757">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>D6E0ED66-3D64-142C-AA34-98CAE850D235</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="City" id="A6DED2AE-2B89-633C-C901-04204889F61F">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>EA48E2E9-76BD-FBCF-532D-D02FCD0CF48F</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="UnpaidFine" id="E22F68C4-BA05-93A7-7D2F-2374A0711389">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>D6688E1B-A76F-9F96-4D6D-86741B969299</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>11</dataTypePrecision>
+<dataTypeScale>2</dataTypeScale>
+<ownDataTypeParameters>,11,2</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="5F07FD71-FC5D-2A85-6937-E1FDE6322E85" name="Patron_PK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>912ABBFE-7A94-8E21-67AC-0A3E00D99A7C</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="28ADB55A-A54E-2C52-C4F2-1EC13A87CD81"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

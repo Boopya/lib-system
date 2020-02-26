@@ -1,0 +1,76 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="93DB236A-CD18-3152-BF47-BEEFA5E2F23B" name="Librarian">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>CE9BBFC7-5CC8-AE41-3C3A-C91347E79F14</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="LoginID" id="C19C8818-2881-002A-EE09-A5A29BAE006B">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>4900452B-7750-D69C-C0C5-6DE3B1AF2017</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>25</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6BACCC05-89D1-28F6-4351-E70CFFE4E4D0" referredColumn="28ADB55A-A54E-2C52-C4F2-1EC13A87CD81"/>
+</associations>
+</Column>
+<Column name="BookAccessPermission" id="96313E84-741D-11D4-4CBE-D0E574FD4FA6">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>833C7D54-2160-34CE-5754-120B61F8FAF5</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="UserAccessPermission" id="A2447E2E-3593-C38B-41A9-699471CB7CC7">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>D93C24E9-F5F1-EB88-E3F6-E52FAD81E041</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="C289249C-9C49-3246-7E00-015344062B1E" name="Librarian_PK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>912ABBFE-7A94-8E21-67AC-0A3E00D99A7C</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C19C8818-2881-002A-EE09-A5A29BAE006B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BC99156A-663A-9940-4478-18C5CD74811A" name="Librarian_Patron_FK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>70528E45-2947-C3DA-F429-CB78974EF203</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C19C8818-2881-002A-EE09-A5A29BAE006B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

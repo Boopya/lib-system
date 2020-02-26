@@ -1,0 +1,50 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="08B7111D-B6E7-47E3-3469-103555E8A0E4" name="Shelf">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-02-22 07:04:29 UTC</createdTime>
+<generatorID>849DDC85-73C0-2FC4-011A-344ADE5AE113</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ShelfID" id="947BA7DF-470C-33F0-4B68-7DC1269FC6A2">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-02-22 07:04:29 UTC</createdTime>
+<generatorID>0DD81270-4284-EBB6-C229-5E1B247FBB1A</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>20</dataTypePrecision>
+<ownDataTypeParameters>,20,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Capacity" id="C0E37343-ACD4-29F2-9E18-C75C883B7879">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-02-22 07:04:29 UTC</createdTime>
+<generatorID>E030DCC0-31EF-0477-BD3D-B0E0D1F34277</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>3</dataTypePrecision>
+<ownDataTypeParameters>,3,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="153A4F12-47CA-0B73-71B0-2BA694932ACC" name="Shelf_PK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-02-22 07:04:29 UTC</createdTime>
+<generatorID>0232A547-1E11-75CB-8CC5-CAAB48C2A22B</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="947BA7DF-470C-33F0-4B68-7DC1269FC6A2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

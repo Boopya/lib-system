@@ -1,0 +1,65 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="40D2074A-5611-920C-6C51-57061A156250" name="Patron">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:22:41 UTC</createdTime>
+<generatorID>CE9BBFC7-5CC8-AE41-3C3A-C91347E79F14</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="LoginID" id="DEE73EDF-9546-A618-42C5-C24D4ACC4715">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:22:41 UTC</createdTime>
+<generatorID>4900452B-7750-D69C-C0C5-6DE3B1AF2017</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>50</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="68B19FDA-3513-9834-C331-EC6D0B968CDB" referredColumn="38DCA295-E776-D279-DF35-CA334D4A8A4A"/>
+</associations>
+</Column>
+<Column name="UnpaidFine" id="2BD9094A-3E09-6443-98D3-C77D7AEDFECF">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:22:41 UTC</createdTime>
+<generatorID>833C7D54-2160-34CE-5754-120B61F8FAF5</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>11</dataTypePrecision>
+<dataTypeScale>2</dataTypeScale>
+<ownDataTypeParameters>,11,2</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="BDD41DEF-D5B6-F15B-F385-ECD103B6EA0C" name="Patron_PK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:22:41 UTC</createdTime>
+<generatorID>912ABBFE-7A94-8E21-67AC-0A3E00D99A7C</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DEE73EDF-9546-A618-42C5-C24D4ACC4715"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="479D5F36-2B98-D8B6-0EC7-586713A665EB" name="Patron_User_FK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 08:22:41 UTC</createdTime>
+<generatorID>70528E45-2947-C3DA-F429-CB78974EF203</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DEE73EDF-9546-A618-42C5-C24D4ACC4715"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

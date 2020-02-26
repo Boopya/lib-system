@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="3AFDC119-F4FB-0665-0FA2-536F4285AE21" containerWithKeyObject="7F880C0E-1808-0D0B-EF63-6690A38B8673" localFKIndex="3AD74A96-B66D-ADBA-A0AE-D8477E4BFCB4" name="Transaction_Patron_FK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 06:22:14 UTC</createdTime>
+<generatorID>CDA1B6B7-9F3F-4FC8-22CD-1B4AC650E942</generatorID>
+<ownerDesignName>Library System</ownerDesignName>
+<referredTableLongName>Patron</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>06BA362D-25D2-AF4C-736C-9258165DB23B</referredTableID>
+<keyObject>3A0DFA4A-3A6D-9933-CCE5-9199D75B9D7B</keyObject>
+<referredKeyID>3A0DFA4A-3A6D-9933-CCE5-9199D75B9D7B</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>LoginID</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

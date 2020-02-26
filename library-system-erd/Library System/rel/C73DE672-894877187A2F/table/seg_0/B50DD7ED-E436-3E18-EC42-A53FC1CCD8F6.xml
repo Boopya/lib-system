@@ -1,0 +1,94 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="B50DD7ED-E436-3E18-EC42-A53FC1CCD8F6" name="BookAuthor">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="Book_ISBN" id="CDF7EB78-FADF-505C-2E97-FCCD761EEBF0">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>13</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AF0BFC2B-98DB-9237-303E-4CFF8FFA878F" referredColumn="CCDD7FD4-B433-2060-63C5-5C7B37843362"/>
+</associations>
+</Column>
+<Column name="Book_CopyNumber" id="6B219D7E-D626-2809-9ED1-09136DFCD348">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>3</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AF0BFC2B-98DB-9237-303E-4CFF8FFA878F" referredColumn="476EE21D-3338-403E-3F0B-D6FA14359548"/>
+</associations>
+</Column>
+<Column name="Author_AuthorID" id="0DA56467-1B6F-2CCE-0E0A-D1C6AA1D9C83">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>20</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="C4A2814F-907A-9D6E-80A8-B077B32BED32" referredColumn="B0E6FFC1-52E3-EFE2-C93A-0924D895A1D4"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="4C7A7B81-5418-DD29-5F8B-3CD113F59227" name="BookAuthor_PK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="CDF7EB78-FADF-505C-2E97-FCCD761EEBF0"/>
+<colUsage columnID="6B219D7E-D626-2809-9ED1-09136DFCD348"/>
+<colUsage columnID="0DA56467-1B6F-2CCE-0E0A-D1C6AA1D9C83"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="AD0B04C0-C98A-B055-E444-5D23F205F05A" name="BookAuthor_Book_FK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>40027EC1-D0B1-F373-BA4B-30E2D268D2DF</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="CDF7EB78-FADF-505C-2E97-FCCD761EEBF0"/>
+<colUsage columnID="6B219D7E-D626-2809-9ED1-09136DFCD348"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6F75D46B-4DDD-8F03-B977-014FCD87D8AE" name="BookAuthor_Author_FK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>40027EC1-D0B1-F373-BA4B-30E2D268D2DF</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="0DA56467-1B6F-2CCE-0E0A-D1C6AA1D9C83"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

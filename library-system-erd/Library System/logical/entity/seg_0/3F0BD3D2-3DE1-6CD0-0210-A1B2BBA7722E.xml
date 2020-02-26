@@ -1,0 +1,86 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="3F0BD3D2-3DE1-6CD0-0210-A1B2BBA7722E" name="Author">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 06:07:52 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="31EB8161-0E3C-891A-D14C-715EDA8ABB87" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="AuthorID" id="3FA7AA04-3590-29C7-EDE7-C0FF45E995BB">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 06:08:37 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="31EB8161-0E3C-891A-D14C-715EDA8ABB87" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>20</dataTypePrecision>
+<ownDataTypeParameters>,20,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="FirstName" id="47FE4A28-18B5-B6CD-2F80-28FCA35C96F2">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 06:08:13 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="31EB8161-0E3C-891A-D14C-715EDA8ABB87" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="MiddleName" id="C93BC06F-227D-738F-38E6-22F452B2A79F">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 06:08:13 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="31EB8161-0E3C-891A-D14C-715EDA8ABB87" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="LastName" id="F4640B57-E719-4069-A821-B7E6748C3606">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 06:08:13 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="31EB8161-0E3C-891A-D14C-715EDA8ABB87" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="98BC37F4-E8E4-A9A5-1A24-EBAA1A90148F" name="Author PK">
+<createdBy>ELIO</createdBy>
+<createdTime>2020-01-18 06:10:53 UTC</createdTime>
+<ownerDesignName>Library System v2</ownerDesignName>
+<engineerTo>
+<item key="31EB8161-0E3C-891A-D14C-715EDA8ABB87" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>3FA7AA04-3590-29C7-EDE7-C0FF45E995BB</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

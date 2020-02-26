@@ -1,0 +1,136 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="172BE12E-8721-0700-EB24-F165B7C74C57" name="Book">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>776512F3-4E23-F8B3-8D19-0DF02F174462</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ISBN" id="CCDD7FD4-B433-2060-63C5-5C7B37843362">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>0E829328-1DAD-623F-28E0-3CD66390AF31</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>13</dataTypePrecision>
+<ownDataTypeParameters>,13,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CopyNumber" id="476EE21D-3338-403E-3F0B-D6FA14359548">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>9481CD4A-A45D-1F31-E5D2-FAE4640A17F2</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>3</dataTypePrecision>
+<ownDataTypeParameters>,3,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Title" id="7ADC8FFF-EB5D-2C50-60BB-F37CDADF6F35">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>678388C4-1A45-7E7F-4ADF-DA3EC1BEA362</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50</dataTypeSize>
+<ownDataTypeParameters>50,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="PublicationYear" id="8E0B4773-E8E6-CFC1-BE60-DA6A80086CA0">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>31A1EA52-A201-C2F2-B438-A6CD691D8CE4</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>4</dataTypePrecision>
+<ownDataTypeParameters>,4,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CurrentStatus" id="7A0106BB-3116-BD2D-1BDA-A3CDC19D36D9">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>3F8FD399-FB03-E616-DCC0-AB4479442C6F</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="StatusDate" id="16498A20-8DED-6EC6-7E82-5E27E7B3BA8D">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>4B28B504-0E19-A519-F46F-D3504C1CD467</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ReservationDate" id="DE3B9BD2-15B0-96EC-26D2-8D9139C454BC">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>8284FA8D-F0A2-73B2-E71B-B68151DB43CC</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Shelf_ShelfID" id="7F8C0CC0-6B28-AB1E-DC40-1272C3FA1E2B">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>4164F22B-B8AD-0715-965B-13823D12FCD6</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>20</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="70E64282-519B-A7D2-90EE-EE09AA9B68C8" referredColumn="F1AE04DB-F620-674B-04DB-7EC44B50CDE9"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="80FB9DE9-8D31-1142-512F-423D413E82E7" name="Book_PK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>625E1155-5248-05A2-173C-51F405CCFC8B</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="CCDD7FD4-B433-2060-63C5-5C7B37843362"/>
+<colUsage columnID="476EE21D-3338-403E-3F0B-D6FA14359548"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D6A2EAE1-87CD-15A2-A7AB-470E764A0407" name="Book_Shelf_FK">
+<createdBy>Rikiya</createdBy>
+<createdTime>2020-02-25 03:28:51 UTC</createdTime>
+<generatorID>63D2BCEF-FCE8-CADA-2A20-A54C84C97DC6</generatorID>
+<ownerDesignName>Library System v2</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7F8C0CC0-6B28-AB1E-DC40-1272C3FA1E2B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
