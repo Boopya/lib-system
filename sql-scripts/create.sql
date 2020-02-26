@@ -37,6 +37,14 @@ ALTER TABLE librarian
         ( '111','110','100','000','001','011','010','101' ));
         
         
+-- SHELF --
+CREATE TABLE shelf (
+    shelfid    NUMBER(20) NOT NULL,
+    capacity   NUMBER(3) NOT NULL
+);
+
+ALTER TABLE shelf ADD CONSTRAINT shelf_pk PRIMARY KEY ( shelfid );
+        
 -- BOOK --
 CREATE TABLE book (
     isbn              NUMBER(13) NOT NULL,
@@ -58,7 +66,7 @@ ALTER TABLE book
 ALTER TABLE book ADD CONSTRAINT currentstatus_check CHECK ( 
     currentstatus IN ( 'ON-SHELF','ON-HOLD','ON-LOAN' ));
         
-        
+
 -- AUTHOR --
 CREATE TABLE author (
     authorid     NUMBER(20) NOT NULL,
@@ -68,15 +76,6 @@ CREATE TABLE author (
 );
 
 ALTER TABLE author ADD CONSTRAINT author_pk PRIMARY KEY ( authorid );
-
-
--- SHELF --
-CREATE TABLE shelf (
-    shelfid    NUMBER(20) NOT NULL,
-    capacity   NUMBER(3) NOT NULL
-);
-
-ALTER TABLE shelf ADD CONSTRAINT shelf_pk PRIMARY KEY ( shelfid );
 
 
 -- TRANSACTION --
