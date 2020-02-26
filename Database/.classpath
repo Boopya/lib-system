@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-13">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.osgi_3.15.100.v20191114-1701.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.osgi_3.15.100.v20191114-1701.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.core.commands_3.9.600.v20191122-2109.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.core.commands_3.9.600.v20191122-2109.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.equinox.common_3.10.600.v20191004-1420.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.equinox.common_3.10.600.v20191004-1420.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.equinox.registry_3.8.600.v20191017-2055.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.equinox.registry_3.8.600.v20191017-2055.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.core.runtime_3.17.0.v20191122-2104.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.core.runtime_3.17.0.v20191122-2104.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.text_3.10.0.v20191122-2108.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.text_3.10.0.v20191122-2108.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.swt.win32.win32.x86_64_3.113.0.v20191204-0601.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.swt.win32.win32.x86_64_3.113.0.v20191204-0601.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.jface_3.18.0.v20191122-2109.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.jface_3.18.0.v20191122-2109.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.jface.text_3.16.100.v20191203-1634.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.jface.text_3.16.100.v20191203-1634.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.ui.workbench_3.117.0.v20191126-1131.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.ui.workbench_3.117.0.v20191126-1131.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/com.ibm.icu_64.2.0.v20190507-1337.jar" sourcepath="C:/Users/James/.p2/pool/plugins/com.ibm.icu_64.2.0.v20190507-1337.jar"/>
+	<classpathentry kind="lib" path="C:/Users/James/.p2/pool/plugins/org.eclipse.ui.forms_3.8.200.v20191114-0830.jar" sourcepath="C:/Users/James/.p2/pool/plugins/org.eclipse.ui.forms_3.8.200.v20191114-0830.jar"/>
+	<classpathentry kind="lib" path="jgoodies-forms-1.8.0.jar" sourcepath="jgoodies-forms-1.8.0-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
