@@ -17,9 +17,11 @@ ALTER TABLE patron ADD CONSTRAINT patron_pk PRIMARY KEY ( loginid );
 
 -- LIBRARIAN --
 CREATE TABLE librarian (
-    loginid      NUMBER(25) NOT NULL,
-    bookaccess   VARCHAR2(3) NOT NULL,
-    useraccess   VARCHAR2(3) NOT NULL
+    loginid         NUMBER(25) NOT NULL,
+    patronaccess    VARCHAR2(3) NOT NULL,
+    libaccess       VARCHAR2(3) NOT NULL,
+    bookaccess      VARCHAR2(3) NOT NULL,
+    transaccess     VARCHAR2(3) NOT NULL
 );
 
 ALTER TABLE librarian ADD CONSTRAINT librarian_pk PRIMARY KEY ( loginid );
@@ -27,13 +29,21 @@ ALTER TABLE librarian ADD CONSTRAINT librarian_pk PRIMARY KEY ( loginid );
 ALTER TABLE librarian
     ADD CONSTRAINT librarian_patron_fk FOREIGN KEY ( loginid )
         REFERENCES patron ( loginid );
+
+ALTER TABLE librarian 
+    ADD CONSTRAINT patronaccess_check CHECK ( patronaccess IN
+        ( '111','110','100','000','001','011','010','101' ));
+
+ALTER TABLE librarian 
+    ADD CONSTRAINT libaccess_check CHECK ( libaccess IN 
+        ( '111','110','100','000','001','011','010','101' ));
         
 ALTER TABLE librarian 
     ADD CONSTRAINT bookaccess_check CHECK ( bookaccess IN
         ( '111','110','100','000','001','011','010','101' ));
-        
-ALTER TABLE librarian 
-    ADD CONSTRAINT useraccess_check CHECK ( useraccess IN
+
+ALTER TABLE librarian
+    ADD CONSTRAINT transaccess_check CHECK ( transaccess IN
         ( '111','110','100','000','001','011','010','101' ));
         
         

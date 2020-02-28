@@ -72,8 +72,10 @@ CREATE OR REPLACE PROCEDURE add_librarian (
     user_brgy patron.barangay%type,
     user_city patron.city%type,
     user_unpaid patron.unpaidfine%type,
+    patron_access librarian.patronaccess%type,
+    lib_access librarian.libaccess%type,
     book_access librarian.bookaccess%type,
-    user_access librarian.useraccess%type ) IS
+    trans_access librarian.transaccess%type ) IS
 BEGIN
     add_user(
         user_id,
@@ -87,8 +89,12 @@ BEGIN
         user_city,
         user_unpaid);
         
-    INSERT INTO librarian 
-        VALUES (user_id,book_access,user_access);
+    INSERT INTO librarian VALUES (
+        user_id,
+        patron_access,
+        lib_access,
+        book_access,
+        trans_access);
 END add_librarian;
 /
 
@@ -104,8 +110,10 @@ CREATE OR REPLACE PROCEDURE edit_librarian (
     user_brgy patron.barangay%type,
     user_city patron.city%type,
     user_unpaid patron.unpaidfine%type,
-    user_access librarian.useraccess%type,
-    book_access librarian.bookaccess%type ) IS
+    patron_access librarian.patronaccess%type,
+    lib_access librarian.libaccess%type,
+    book_access librarian.bookaccess%type,
+    trans_access librarian.transaccess%type ) IS
 BEGIN
     edit_user(
         old_user_id,
@@ -122,8 +130,10 @@ BEGIN
         
     UPDATE librarian SET
         loginid = user_id,
+        patronaccess = patron_access,
+        libaccess = lib_access,
         bookaccess = book_access,
-        useraccess = user_access
+        transaccess = trans_access
     WHERE loginid = old_user_id;
 END edit_librarian;
 /
