@@ -105,7 +105,15 @@ public class LoginFrame extends JFrame {
 				int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to exit?", 
 				"Exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (response == JOptionPane.YES_OPTION){
-					dispose();
+					try {
+						con.close();
+						dispose();
+					}
+					catch (SQLException e){
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
+						"SQLException", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
@@ -186,7 +194,7 @@ public class LoginFrame extends JFrame {
 
 	private void createPatronFrame(){
 		PatronFrame patron = new PatronFrame(con);
-		patron.setSize(500,300);
+		patron.setSize(800,550);
 		patron.setResizable(false);
 		patron.setLocationRelativeTo(null);
 		patron.setVisible(true);
@@ -195,7 +203,7 @@ public class LoginFrame extends JFrame {
 
 	private void createLibrarianFrame(){
 		LibrarianFrame librarian = new LibrarianFrame(con);
-		librarian.setSize(500,300);
+		librarian.setSize(800,550);
 		librarian.setResizable(false);
 		librarian.setLocationRelativeTo(null);
 		librarian.setVisible(true);
