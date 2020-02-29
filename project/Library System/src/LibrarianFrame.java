@@ -3,11 +3,15 @@ import java.awt.event.*;
 import com.sun.rowset.CachedRowSetImpl;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.Document;
 
 import java.sql.*;
+import java.util.regex.PatternSyntaxException;
 
 public class LibrarianFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -22,14 +26,17 @@ public class LibrarianFrame extends JFrame {
 	private CachedRowSet[] rowSets = new CachedRowSet[tables.length];
 	private CustomTableModel[] tableModels = new CustomTableModel[tables.length];
 	private TableRowSorter<CustomTableModel>[] sorters = new TableRowSorter[tableModels.length];
-	
+
 	private String[][] columnNames = {
-		new String[] {"Transaction ID","Transaction Date","Transaction Mode","Login ID","ISBN","Copy Number"},
-		new String[] {"Login ID","First Name","Middle Name","Last Name","Password","House No.","Street","Barangay","City","Unpaid Fine"},
-		new String[] {"ISBN","Copy Number","Title","Year of Publication","Current Status","Status Date","Shelf ID"},
-		new String[] {"Login ID","First Name","Middle Name","Last Name","Password","House No.","Street","Barangay","City","Unpaid Fine",
-					  "Patron Access","Librarian Access","Book Access","Transaction Access"}
-	};
+			new String[] { "Transaction ID", "Transaction Date", "Transaction Mode", "Login ID", "ISBN",
+					"Copy Number" },
+			new String[] { "Login ID", "First Name", "Middle Name", "Last Name", "Password", "House No.", "Street",
+					"Barangay", "City", "Unpaid Fine" },
+			new String[] { "ISBN", "Copy Number", "Title", "Year of Publication", "Current Status", "Status Date",
+					"Shelf ID" },
+			new String[] { "Login ID", "First Name", "Middle Name", "Last Name", "Password", "House No.", "Street",
+					"Barangay", "City", "Unpaid Fine", "Patron Access", "Librarian Access", "Book Access",
+					"Transaction Access" } };
 
 	private JPanel[] searchPanels = new JPanel[panels.length];
 	private JLabel[] searchLabels = new JLabel[searchPanels.length];
@@ -49,15 +56,16 @@ public class LibrarianFrame extends JFrame {
 		tabbedPane = new JTabbedPane();
 
 		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.insets = new Insets(10,10,10,10);
+		constraints.insets = new Insets(10, 10, 10, 10);
 
 		for (int i = 0; i < panels.length; ++i) {
 			panels[i] = new JPanel(new GridBagLayout());
 			tabbedPane.add(panelTitles[i], panels[i]);
 
-			tables[i] = new JTable(){
+			tables[i] = new JTable() {
 				private static final long serialVersionUID = 1L;
-				public boolean getScrollableTracksViewportWidth(){
+
+				public boolean getScrollableTracksViewportWidth() {
 					return getPreferredSize().width < getParent().getWidth();
 				}
 			};
@@ -68,16 +76,14 @@ public class LibrarianFrame extends JFrame {
 			rowSets[i].setUsername(AccessCredentials.DATABASE_USERNAME);
 			rowSets[i].setPassword(AccessCredentials.DATABASE_PASSWORD);
 			rowSets[i].setUrl(AccessCredentials.DATABASE_HOST);
-			if (i == 1){
+			if (i == 1) {
 				rowSets[i].setCommand("SELECT * FROM PATRON WHERE LOGINID NOT IN (SELECT LOGINID FROM LIBRARIAN)");
-			}
-			else if (i == 3){
-				rowSets[i].setCommand("SELECT P.LOGINID, P.FIRSTNAME, P.MIDDLENAME, P.LASTNAME, P.PASSWORD, " + 
-									  "P.HOUSENO, P.STREET, P.BARANGAY, P.CITY, P.UNPAIDFINE, " + 
-									  "L.PATRONACCESS, L.LIBACCESS, L.BOOKACCESS, L.TRANSACCESS " + 
-									  "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
-			}
-			else {
+			} else if (i == 3) {
+				rowSets[i].setCommand("SELECT P.LOGINID, P.FIRSTNAME, P.MIDDLENAME, P.LASTNAME, P.PASSWORD, "
+						+ "P.HOUSENO, P.STREET, P.BARANGAY, P.CITY, P.UNPAIDFINE, "
+						+ "L.PATRONACCESS, L.LIBACCESS, L.BOOKACCESS, L.TRANSACCESS "
+						+ "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
+			} else {
 				rowSets[i].setCommand("SELECT * FROM " + panelTitles[i].toUpperCase());
 			}
 			rowSets[i].execute();
@@ -85,7 +91,7 @@ public class LibrarianFrame extends JFrame {
 			tableModels[i] = new CustomTableModel(rowSets[i]);
 			sorters[i] = new TableRowSorter<CustomTableModel>(tableModels[i]);
 			tables[i].setModel(tableModels[i]);
-			tables[i].setPreferredScrollableViewportSize(new Dimension(800,350));
+			tables[i].setPreferredScrollableViewportSize(new Dimension(800, 350));
 			tables[i].setFillsViewportHeight(true);
 			tables[i].getTableHeader().setReorderingAllowed(false);
 			tables[i].setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -93,9 +99,13 @@ public class LibrarianFrame extends JFrame {
 
 			searchLabels[i] = new JLabel("Search:");
 			searchFields[i] = new JTextField();
-			searchFields[i].setPreferredSize(new Dimension(300,20));
+			searchFields[i].setPreferredSize(new Dimension(300, 20));
 			searchBoxes[i] = new JComboBox<String>(columnNames[i]);
 			searchBoxes[i].setSelectedIndex(0);
+
+			searchFields[i].getDocument().addDocumentListener(new SearchListener());
+			searchFields[i].addKeyListener(new SearchListener());
+			searchBoxes[i].addItemListener(new SearchListener());
 
 			searchPanels[i] = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			searchPanels[i].add(searchLabels[i]);
@@ -111,40 +121,38 @@ public class LibrarianFrame extends JFrame {
 			constraints.gridy = 0;
 			constraints.anchor = GridBagConstraints.CENTER;
 			constraints.gridwidth = 4;
-			panels[i].add(searchPanels[i],constraints);
+			panels[i].add(searchPanels[i], constraints);
 
 			constraints.gridx = 0;
 			constraints.gridy = 1;
 			constraints.anchor = GridBagConstraints.CENTER;
 			constraints.gridwidth = 4;
-			panels[i].add(new JScrollPane(tables[i],
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-			constraints);
+			panels[i].add(new JScrollPane(tables[i], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), constraints);
 
 			constraints.gridx = 0;
 			constraints.gridy = 2;
 			constraints.anchor = GridBagConstraints.WEST;
 			constraints.gridwidth = 1;
-			panels[i].add(addButtons[i],constraints);
+			panels[i].add(addButtons[i], constraints);
 
 			constraints.gridx = 1;
 			constraints.gridy = 2;
 			constraints.anchor = GridBagConstraints.WEST;
 			constraints.gridwidth = 1;
-			panels[i].add(editButtons[i],constraints);
+			panels[i].add(editButtons[i], constraints);
 
 			constraints.gridx = 2;
 			constraints.gridy = 2;
 			constraints.anchor = GridBagConstraints.WEST;
 			constraints.gridwidth = 1;
-			panels[i].add(deleteButtons[i],constraints);
+			panels[i].add(deleteButtons[i], constraints);
 
 			constraints.gridx = 3;
 			constraints.gridy = 2;
 			constraints.anchor = GridBagConstraints.EAST;
 			constraints.gridwidth = 1;
-			panels[i].add(finishButtons[i],constraints);
+			panels[i].add(finishButtons[i], constraints);
 		}
 
 		tabbedPane.setFocusable(false);
@@ -184,6 +192,7 @@ public class LibrarianFrame extends JFrame {
 			this.metadata = this.crs.getMetaData();
 			cols = metadata.getColumnCount();
 			this.crs.beforeFirst();
+			this.rows = 0;
 			while (this.crs.next()) {
 				++this.rows;
 			}
@@ -195,7 +204,8 @@ public class LibrarianFrame extends JFrame {
 				crs.getStatement().close();
 			} catch (SQLException e) {
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(rootPane, e.getMessage(),
+				"SQLException", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
@@ -251,15 +261,82 @@ public class LibrarianFrame extends JFrame {
 		}
 
 		@Override
-		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) { }
+
+		@Override
+		public void addTableModelListener(TableModelListener l) { }
+
+		@Override
+		public void removeTableModelListener(TableModelListener l) { }
+	}
+
+	private class SearchListener extends KeyAdapter implements DocumentListener, ItemListener {
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			for (int i = 0; i < searchFields.length; ++i){
+				if (searchFields[i].equals((JTextField)e.getSource()) 
+				&& (int)e.getKeyChar() == 10){
+					search(i);
+				}
+			}
 		}
 
 		@Override
-		public void addTableModelListener(TableModelListener l) {
+		public void itemStateChanged(ItemEvent e) {
+			for (int i = 0; i < searchBoxes.length; ++i){
+				if (searchBoxes[i].equals((JComboBox)e.getSource())){
+					search(i);
+				}
+			}
 		}
 
 		@Override
-		public void removeTableModelListener(TableModelListener l) {
+		public void insertUpdate(DocumentEvent e) {
+			for (int i = 0; i < searchFields.length; ++i){
+				if (searchFields[i].getDocument().equals((Document)e.getDocument())){
+					search(i);
+				}
+			}
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			for (int i = 0; i < searchFields.length; ++i){
+				if (searchFields[i].getDocument().equals((Document)e.getDocument())){
+					search(i);
+				}
+			}
+		}
+
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			for (int i = 0; i < searchFields.length; ++i){
+				if (searchFields[i].getDocument().equals((Document)e.getDocument())){
+					search(i);
+				}
+			}
+		}
+
+		private void search(int i){
+			try {
+				RowFilter<CustomTableModel,Object> rowFilter = null;
+				rowFilter = RowFilter.regexFilter("(?i)" + searchFields[i].getText(), 
+				searchBoxes[i].getSelectedIndex());
+				sorters[i].setRowFilter(rowFilter);
+			}
+			catch (NullPointerException e) {
+
+			}
+			catch (PatternSyntaxException e) {
+				JOptionPane.showMessageDialog(rootPane,e.getMessage(),
+				"PatternSyntaxException",JOptionPane.ERROR_MESSAGE);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(rootPane,e.getMessage(),
+				"Exception",JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 }
