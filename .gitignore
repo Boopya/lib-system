@@ -1,3 +1,4 @@
+.vscode/settings.json
 *.class
 *.properties
 project/Library System/build/classes/.netbeans_automatic_build
