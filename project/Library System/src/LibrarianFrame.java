@@ -9,6 +9,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.PatternSyntaxException;
 
 public class LibrarianFrame extends JFrame {
@@ -39,7 +42,7 @@ public class LibrarianFrame extends JFrame {
 	private JPanel[] searchPanels = new JPanel[panels.length];
 	private JLabel[] searchLabels = new JLabel[searchPanels.length];
 	private JTextField[] searchFields = new JTextField[searchPanels.length];
-	private JComboBox<String>[] searchBoxes = new JComboBox[searchPanels.length];
+	private JComboBox<?>[] searchBoxes = new JComboBox[searchPanels.length];
 
 	private JButton[] addButtons = new JButton[panels.length];
 	private JButton[] editButtons = new JButton[panels.length];
@@ -293,8 +296,18 @@ public class LibrarianFrame extends JFrame {
 
 		Object[] field = null;
 
+		Calendar calendar = Calendar.getInstance();
+		Date initDate = calendar.getTime();
+		calendar.add(Calendar.YEAR, -100);
+		Date startDate = calendar.getTime();
+		calendar.add(Calendar.YEAR, 200);
+		Date endDate = calendar.getTime();
+		SpinnerModel dateModel = new SpinnerDateModel(initDate, startDate, endDate, Calendar.DAY_OF_MONTH);
+		JSpinner dateSpinner = new JSpinner(dateModel);
+		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy"));
+
 		if (table == 0) {
-			field = new Object[] { new JTextField(), new JSpinner(),
+			field = new Object[] { new JTextField(), dateSpinner,
 					new JComboBox<String>(new String[] { "LOAN", "RETURN", "RESERVE" }), new JTextField(),
 					new JTextField(), new JTextField() };
 		} else if (table == 1) {
@@ -303,7 +316,7 @@ public class LibrarianFrame extends JFrame {
 					new JTextField() };
 		} else if (table == 2) {
 			field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
-					new JComboBox<String>(new String[] { "ON-SHELF", "ON-HOLD", "ON-LOAN" }), new JSpinner(),
+					new JComboBox<String>(new String[] { "ON-SHELF", "ON-HOLD", "ON-LOAN" }), dateSpinner,
 					new JTextField() };
 		} else if (table == 3) {
 			String[] access = { "111", "110", "100", "000", "001", "011", "010", "101" };
@@ -335,9 +348,25 @@ public class LibrarianFrame extends JFrame {
 
 						try {
 							String[] data = new String[columnNames[table].length];
-							CallableStatement cs;
+							CallableStatement cs = null;
+							Object[] rowData = null;
 
 							if (table == 0) {
+								for (int i = 0, j = 0; i < data.length; ++i){
+									if (i == 0 || i  < data.length - 3){
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else if (i == 1){
+										data[i++] = new SimpleDateFormat("dd/MM/yyyy")
+										.format(((JSpinner)prompt[++j]).getValue());
+									}
+									else {	// Index 2
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+								}
+
+								cs = con.prepareCall("{call add_transaction(?,?,?,?,?,?)}");
 
 							} else if (table == 1) {
 								for (int i = 0, j = 0; i < data.length; ++j) {
@@ -345,18 +374,52 @@ public class LibrarianFrame extends JFrame {
 								}
 
 								cs = con.prepareCall("{call add_user(?,?,?,?,?,?,?,?,?,?)}");
-								for (int i = 0; i < data.length; ++i) {
-									cs.setString(i + 1, data[i]);
-								}
-
-								dialog.dispose();
 
 							} else if (table == 2) {
+								for (int i = 0, j = 0; i < data.length; ++j){
+									if (i != 4 || i != 5){
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else if (i == 4){
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+									else {	// Index 5
+										data[i++] = new SimpleDateFormat("dd/MM/yyyy")
+										.format(((JSpinner)prompt[++j]).getValue());
+									}
+								}
+
+								cs = con.prepareCall("{call add_book(?,?,?,?,?,?,?)}");
 
 							} else if (table == 3) {
+								for (int i = 0, j = 0; i < data.length; ++j) {
+									if (i < data.length - 4) {
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else {
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+								}
 
+								cs = con.prepareCall("{call add_librarian(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
 							}
-						} catch (SQLException e) {
+
+							rowData = new Object[data.length];
+							for (int i = 0; i < data.length; ++i) {
+								cs.setString(i + 1, data[i]);
+								rowData[i] = data[i];
+							}
+
+							cs.executeUpdate();
+							tableModels[table].addRow(rowData);
+							dialog.dispose();
+
+							JOptionPane.showMessageDialog(rootPane,panelTitles[table] + " Added!", 
+							addButtons[table].getText(),JOptionPane.INFORMATION_MESSAGE);
+						} 
+						catch (SQLException e) {
 							e.printStackTrace();
 							JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
 									JOptionPane.ERROR_MESSAGE);
@@ -403,7 +466,7 @@ public class LibrarianFrame extends JFrame {
 		@Override
 		public void itemStateChanged(ItemEvent e) {
 			for (int i = 0; i < searchBoxes.length; ++i){
-				if (searchBoxes[i].equals((JComboBox<String>)e.getSource())){
+				if (searchBoxes[i].equals((JComboBox<?>)e.getSource())){
 					search(i);
 				}
 			}
