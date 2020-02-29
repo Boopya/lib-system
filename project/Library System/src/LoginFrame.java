@@ -194,7 +194,7 @@ public class LoginFrame extends JFrame {
 
 	private void createPatronFrame(){
 		PatronFrame patron = new PatronFrame(con);
-		patron.setSize(800,550);
+		patron.setSize(900,600);
 		patron.setResizable(false);
 		patron.setLocationRelativeTo(null);
 		patron.setVisible(true);
@@ -202,12 +202,19 @@ public class LoginFrame extends JFrame {
 	}
 
 	private void createLibrarianFrame(){
-		LibrarianFrame librarian = new LibrarianFrame(con);
-		librarian.setSize(800,550);
-		librarian.setResizable(false);
-		librarian.setLocationRelativeTo(null);
-		librarian.setVisible(true);
-		dispose();
+		try {
+			LibrarianFrame librarian = new LibrarianFrame(con);
+			librarian.setSize(900,600);
+			librarian.setResizable(false);
+			librarian.setLocationRelativeTo(null);
+			librarian.setVisible(true);
+			dispose();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
+			"SQLException", JOptionPane.ERROR_MESSAGE);
+		}
+		
 	}
 
 	private class LoginListener extends KeyAdapter implements ActionListener {
