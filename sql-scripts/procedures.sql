@@ -60,6 +60,92 @@ BEGIN
 END delete_user;
 /
 
+-- LIBRARIAN GENERAL PROCEDURES --
+CREATE OR REPLACE PROCEDURE add_librarian (
+    user_id patron.loginid%type,
+    user_fname patron.firstname%type,
+    user_mname patron.middlename%type,
+    user_lname patron.lastname%type,
+    user_pass patron.password%type,
+    user_houseno patron.houseno%type,
+    user_st patron.street%type,
+    user_brgy patron.barangay%type,
+    user_city patron.city%type,
+    user_unpaid patron.unpaidfine%type,
+    patron_access librarian.patronaccess%type,
+    lib_access librarian.libaccess%type,
+    book_access librarian.bookaccess%type,
+    trans_access librarian.transaccess%type ) IS
+BEGIN
+    add_user(
+        user_id,
+        user_fname,
+        user_mname,
+        user_lname,
+        user_pass,
+        user_houseno,
+        user_st,
+        user_brgy,
+        user_city,
+        user_unpaid);
+        
+    INSERT INTO librarian VALUES (
+        user_id,
+        patron_access,
+        lib_access,
+        book_access,
+        trans_access);
+END add_librarian;
+/
+
+CREATE OR REPLACE PROCEDURE edit_librarian (
+    old_user_id patron.loginid%type,
+    user_id patron.loginid%type,
+    user_fname patron.firstname%type,
+    user_mname patron.middlename%type,
+    user_lname patron.lastname%type,
+    user_pass patron.password%type,
+    user_houseno patron.houseno%type,
+    user_st patron.street%type,
+    user_brgy patron.barangay%type,
+    user_city patron.city%type,
+    user_unpaid patron.unpaidfine%type,
+    patron_access librarian.patronaccess%type,
+    lib_access librarian.libaccess%type,
+    book_access librarian.bookaccess%type,
+    trans_access librarian.transaccess%type ) IS
+BEGIN
+    edit_user(
+        old_user_id,
+        user_id,
+        user_fname,
+        user_mname,
+        user_lname,
+        user_pass,
+        user_houseno,
+        user_st,
+        user_brgy,
+        user_city,
+        user_unpaid);
+        
+    UPDATE librarian SET
+        loginid = user_id,
+        patronaccess = patron_access,
+        libaccess = lib_access,
+        bookaccess = book_access,
+        transaccess = trans_access
+    WHERE loginid = old_user_id;
+END edit_librarian;
+/
+
+CREATE OR REPLACE PROCEDURE delete_librarian (
+   user_id patron.loginid%type ) IS
+BEGIN
+    delete_user(user_id);
+    DELETE FROM librarian WHERE loginid = user_id;
+END delete_librarian;
+/
+
 -- BOOK GENERAL PROCEDURES --
 CREATE OR REPLACE PROCEDURE add_book (
     p_isbn book.isbn%type,
