@@ -1,5 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import com.sun.rowset.CachedRowSetImpl;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.*;
@@ -9,7 +12,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
-
 import java.sql.*;
 import java.util.regex.PatternSyntaxException;
 
@@ -50,6 +52,7 @@ public class LibrarianFrame extends JFrame {
 
 	public LibrarianFrame(Connection con) throws SQLException {
 		this.con = con;
+		this.con.setAutoCommit(false);
 
 		setTitle("Librarian");
 
@@ -117,6 +120,8 @@ public class LibrarianFrame extends JFrame {
 			deleteButtons[i] = new JButton("Delete " + panelTitles[i]);
 			finishButtons[i] = new JButton("Finish");
 
+			finishButtons[i].addActionListener(new FinishListener());
+
 			constraints.gridx = 0;
 			constraints.gridy = 0;
 			constraints.anchor = GridBagConstraints.CENTER;
@@ -167,6 +172,13 @@ public class LibrarianFrame extends JFrame {
 				int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to exit?", "Exit",
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (response == JOptionPane.YES_OPTION) {
+					try {
+						con.rollback();
+					} catch (SQLException e) {
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(rootPane, e.getMessage(),
+						"SQLException", JOptionPane.ERROR_MESSAGE);
+					}
 					createLoginFrame();
 				}
 			}
@@ -180,6 +192,57 @@ public class LibrarianFrame extends JFrame {
 		login.setLocationRelativeTo(null);
 		login.setVisible(true);
 		dispose();
+	}
+
+	private void finishDialog() {
+		Object[] options = { "Save", "Don't Save", "Cancel" };
+		JOptionPane optionPane = new JOptionPane("Do you want to save your changes?", JOptionPane.QUESTION_MESSAGE,
+				JOptionPane.OK_CANCEL_OPTION, null, options);
+		JDialog dialog = new JDialog(this, "Finish", true);
+		dialog.setContentPane(optionPane);
+		optionPane.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (JOptionPane.VALUE_PROPERTY.equals(event.getPropertyName())) {
+					if (optionPane.getValue().equals(options[0])) {
+						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+						try {
+							con.commit();
+						} catch (SQLException e) {
+							e.printStackTrace();
+							JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
+							"SQLException",JOptionPane.ERROR_MESSAGE);
+						}
+						createLoginFrame();
+
+					} else if (optionPane.getValue().equals(options[1])) {
+						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+						try {
+							con.rollback();
+						} catch (SQLException e) {
+							e.printStackTrace();
+							JOptionPane.showMessageDialog(rootPane, e.getMessage(),
+							"SQLException", JOptionPane.ERROR_MESSAGE);
+						}
+						createLoginFrame();
+					}
+					else if (optionPane.getValue().equals(options[2])){
+						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+						dialog.dispose();
+					}
+				}
+			}
+		});
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
+	}
+
+	private class FinishListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			finishDialog();
+		}
 	}
 
 	private class CustomTableModel implements TableModel {
@@ -230,6 +293,7 @@ public class LibrarianFrame extends JFrame {
 			try {
 				return this.metadata.getColumnLabel(columnIndex + 1);
 			} catch (SQLException e) {
+				e.printStackTrace();
 				return e.toString();
 			}
 		}
@@ -285,7 +349,7 @@ public class LibrarianFrame extends JFrame {
 		@Override
 		public void itemStateChanged(ItemEvent e) {
 			for (int i = 0; i < searchBoxes.length; ++i){
-				if (searchBoxes[i].equals((JComboBox)e.getSource())){
+				if (searchBoxes[i].equals((JComboBox<String>)e.getSource())){
 					search(i);
 				}
 			}
