@@ -352,8 +352,8 @@ public class LibrarianFrame extends JFrame {
 							Object[] rowData = null;
 
 							if (table == 0) {
-								for (int i = 0, j = 0; i < data.length; ++i){
-									if (i == 0 || i  < data.length - 3){
+								for (int i = 0, j = 0; i < data.length; ++j){
+									if (i != 1 && i != 2){
 										data[i++] = ((JTextField) prompt[++j]).getText();
 									}
 									else if (i == 1){
@@ -366,7 +366,7 @@ public class LibrarianFrame extends JFrame {
 									}
 								}
 
-								cs = con.prepareCall("{call add_transaction(?,?,?,?,?,?)}");
+								cs = con.prepareCall("{call add_transaction(?,to_date(?,'dd/MM/YYYY'),?,?,?,?)}");
 
 							} else if (table == 1) {
 								for (int i = 0, j = 0; i < data.length; ++j) {
@@ -377,7 +377,7 @@ public class LibrarianFrame extends JFrame {
 
 							} else if (table == 2) {
 								for (int i = 0, j = 0; i < data.length; ++j){
-									if (i != 4 || i != 5){
+									if (i != 4 && i != 5){
 										data[i++] = ((JTextField) prompt[++j]).getText();
 									}
 									else if (i == 4){
@@ -390,7 +390,7 @@ public class LibrarianFrame extends JFrame {
 									}
 								}
 
-								cs = con.prepareCall("{call add_book(?,?,?,?,?,?,?)}");
+								cs = con.prepareCall("{call add_book(?,?,?,?,?,to_date(?,'dd/MM/YYYY'),?)}");
 
 							} else if (table == 3) {
 								for (int i = 0, j = 0; i < data.length; ++j) {
