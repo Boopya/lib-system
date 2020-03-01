@@ -141,8 +141,8 @@ END edit_librarian;
 CREATE OR REPLACE PROCEDURE delete_librarian (
    user_id patron.loginid%type ) IS
 BEGIN
-    delete_user(user_id);
     DELETE FROM librarian WHERE loginid = user_id;
+    delete_user(user_id);
 END delete_librarian;
 /
 
