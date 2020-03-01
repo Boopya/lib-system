@@ -10,9 +10,9 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
 public class LibrarianFrame extends JFrame {
@@ -278,15 +278,21 @@ public class LibrarianFrame extends JFrame {
 	private class AddListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for (int i = 0; i < addButtons.length; ++i) {
-				if (addButtons[i].equals((JButton) e.getSource())) {
-					createAddDialog(i);
+			try {
+				for (int i = 0; i < addButtons.length; ++i) {
+					if (addButtons[i].equals((JButton) e.getSource())) {
+						createAddDialog(i);
+					}
 				}
+			}
+			catch (SQLException ex) {
+				JOptionPane.showMessageDialog(rootPane, ex.getMessage(),
+				"SQLException",JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
-	private void createAddDialog(int table) {
+	private void createAddDialog(int table) throws SQLException {
 		Object[] prompt = new Object[columnNames[table].length * 2];
 
 		Object[] field = null;
@@ -301,20 +307,80 @@ public class LibrarianFrame extends JFrame {
 		JSpinner dateSpinner = new JSpinner(dateModel);
 		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy"));
 
+		Statement statement;
+		statement = con.createStatement();
+		ResultSet rs;
+
 		if (table == 0) {
+
+			rs = statement.executeQuery("SELECT LOGINID FROM PATRON");
+			
+			Vector<String> loginID = new Vector<String>();
+
+			while (rs.next()){
+				loginID.add(rs.getString(1));
+			}
+
+			rs = statement.executeQuery("SELECT ISBN, COPYNUMBER FROM BOOK");
+
+			Vector<String> isbn = new Vector<String>();
+			Vector<String> copynumber = new Vector<String>();
+
+			while (rs.next()){
+				boolean isISBNDuplicate = false;
+				boolean isCopyNumDuplicate = false;
+				for (String value : isbn){
+					if (value.equals(rs.getString(1))){
+						isISBNDuplicate = true;
+						break;
+					}
+				}
+
+				for (String value : copynumber){
+					if (value.equals(rs.getString(2))){
+						isCopyNumDuplicate = true;
+						break;
+					}
+				}
+
+				if (!isISBNDuplicate){
+					isbn.add(rs.getString(1));
+				}
+
+				if (!isCopyNumDuplicate){
+					copynumber.add(rs.getString(2));
+				}
+			}
+
 			field = new Object[] { new JTextField(), dateSpinner,
-					new JComboBox<String>(new String[] { "LOAN", "RETURN", "RESERVE" }), new JTextField(),
-					new JTextField(), new JTextField() };
+					new JComboBox<String>(new String[] { "LOAN", "RETURN", "RESERVE" }),
+					new JComboBox<String>(loginID), new JComboBox<String>(isbn), 
+					new JComboBox<String>(copynumber) };
+
 		} else if (table == 1) {
+
 			field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
 					new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(),
 					new JTextField() };
+
 		} else if (table == 2) {
+
+			rs = statement.executeQuery("SELECT SHELFID FROM SHELF");
+
+			Vector<String> shelfID = new Vector<String>();
+
+			while (rs.next()){
+				shelfID.add(rs.getString(1));
+			}
+
 			field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
 					new JComboBox<String>(new String[] { "ON-SHELF", "ON-HOLD", "ON-LOAN" }), dateSpinner,
-					new JTextField() };
+					new JComboBox<String>(shelfID) };
+
 		} else if (table == 3) {
+
 			String[] access = { "111", "110", "100", "000", "001", "011", "010", "101" };
+			
 			field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
 					new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(),
 					new JTextField(), new JComboBox<String>(access), new JComboBox<String>(access),
@@ -328,8 +394,8 @@ public class LibrarianFrame extends JFrame {
 
 		Object[] options = { "Save", "Cancel" };
 
-		JOptionPane optionPane = new JOptionPane(prompt, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null,
-				options, options[0]);
+		JOptionPane optionPane = new JOptionPane(prompt, JOptionPane.PLAIN_MESSAGE, 
+		JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
 
 		JDialog dialog = new JDialog(this, addButtons[table].getText(), true);
 		dialog.setContentPane(optionPane);
@@ -348,14 +414,14 @@ public class LibrarianFrame extends JFrame {
 
 							if (table == 0) {
 								for (int i = 0, j = 0; i < data.length; ++j){
-									if (i != 1 && i != 2){
+									if (i == 0){
 										data[i++] = ((JTextField) prompt[++j]).getText();
 									}
 									else if (i == 1){
 										data[i++] = new SimpleDateFormat("dd/MM/yyyy")
 										.format(((JSpinner)prompt[++j]).getValue());
 									}
-									else {	// Index 2
+									else {
 										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
 										.getSelectedItem());
 									}
@@ -372,16 +438,16 @@ public class LibrarianFrame extends JFrame {
 
 							} else if (table == 2) {
 								for (int i = 0, j = 0; i < data.length; ++j){
-									if (i != 4 && i != 5){
+									if (i < data.length - 3){
 										data[i++] = ((JTextField) prompt[++j]).getText();
 									}
-									else if (i == 4){
-										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
-										.getSelectedItem());
-									}
-									else {	// Index 5
+									else if (i == 5){
 										data[i++] = new SimpleDateFormat("dd/MM/yyyy")
 										.format(((JSpinner)prompt[++j]).getValue());
+									}
+									else {
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
 									}
 								}
 
@@ -472,7 +538,7 @@ public class LibrarianFrame extends JFrame {
 
 	private void createDeleteDialog(int table, int[] rows) throws SQLException {
 		
-		ArrayList<String[]> keys = new ArrayList<String[]>();
+		Vector<String[]> keys = new Vector<String[]>();
 
 		keys.add(new String[rows.length]);
 		for (int i = 0; i < rows.length; ++i){
