@@ -324,3 +324,5 @@ BEGIN
     update_book_status(p_isbn,p_cpnum,'ON-SHELF',p_transdate);
 END return_book;
 /
+
+COMMIT;

@@ -144,3 +144,5 @@ INSERT INTO PATRON VALUES (
     'Taguig City',      -- city
     0.00                -- unpaid fine
 );
+
+COMMIT;

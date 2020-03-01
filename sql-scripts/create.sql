@@ -136,3 +136,5 @@ ALTER TABLE bookauthor
                                                     book_copynumber )
         REFERENCES book ( isbn,
                           copynumber );
+                          
+COMMIT;

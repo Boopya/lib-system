@@ -19,4 +19,6 @@ INSERT INTO author VALUES
 INSERT INTO author VALUES
 	(18121870,'Charles','Q', 'Dickens');
 INSERT INTO author VALUES
-	(18961940,'Scott','F', 'Fitzgerald');	
+	(18961940,'Scott','F', 'Fitzgerald');
+    
+COMMIT;
