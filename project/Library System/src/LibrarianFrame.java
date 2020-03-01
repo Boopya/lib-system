@@ -10,6 +10,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.PatternSyntaxException;
@@ -175,7 +176,6 @@ public class LibrarianFrame extends JFrame {
 					try {
 						con.rollback();
 					} catch (SQLException e) {
-						e.printStackTrace();
 						JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
 								JOptionPane.ERROR_MESSAGE);
 					}
@@ -247,30 +247,25 @@ public class LibrarianFrame extends JFrame {
 			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (JOptionPane.VALUE_PROPERTY.equals(event.getPropertyName())) {
-					if (optionPane.getValue().equals(options[0])) {
-						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-						try {
+					try {
+						if (optionPane.getValue().equals(options[0])) {
+							optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 							con.commit();
-						} catch (SQLException e) {
-							e.printStackTrace();
-							JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
-									JOptionPane.ERROR_MESSAGE);
-						}
-						createLoginFrame();
-
-					} else if (optionPane.getValue().equals(options[1])) {
-						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-						try {
+							createLoginFrame();
+	
+						} else if (optionPane.getValue().equals(options[1])) {
+							optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 							con.rollback();
-						} catch (SQLException e) {
-							e.printStackTrace();
-							JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
-									JOptionPane.ERROR_MESSAGE);
+							createLoginFrame();
+							
+						} else if (optionPane.getValue().equals(options[2])) {
+							optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+							dialog.dispose();
 						}
-						createLoginFrame();
-					} else if (optionPane.getValue().equals(options[2])) {
-						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-						dialog.dispose();
+					}
+					catch (SQLException e) {
+						JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
+						"SQLException", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
@@ -420,9 +415,8 @@ public class LibrarianFrame extends JFrame {
 							addButtons[table].getText(),JOptionPane.INFORMATION_MESSAGE);
 						} 
 						catch (SQLException e) {
-							e.printStackTrace();
-							JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
-									JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(rootPane, e.getMessage(),
+							"SQLException",JOptionPane.ERROR_MESSAGE);
 						}
 					} else if (optionPane.getValue().equals(options[1])) {
 						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
@@ -440,14 +434,92 @@ public class LibrarianFrame extends JFrame {
 	private class EditListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
+			for (int i = 0; i < editButtons.length; ++i){
+				if (editButtons[i].equals((JButton)e.getSource())){
+					int[] rows = tables[i].getSelectedRows();
+					if (rows.length == 0) return;
+					for (int j = 0; j < rows.length; ++j){
+						createEditDialog(i,j);
+					}
+				}
+			}
 		}
+	}
+
+	private void createEditDialog(int table, int row){
+		
 	}
 
 	private class DeleteListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			try {
+				for (int i = 0; i < deleteButtons.length; ++i){
+					if (deleteButtons[i].equals((JButton)e.getSource())){
+						int[] rows = tables[i].getSelectedRows();
+						if (rows.length == 0) return;
+						createDeleteDialog(i,rows);
+					}
+				}
+			}
+			catch (SQLException ex) {
+				JOptionPane.showMessageDialog(rootPane, ex.getMessage(),
+				"SQLException",JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}
+	}
 
+	private void createDeleteDialog(int table, int[] rows) throws SQLException {
+		
+		ArrayList<String[]> keys = new ArrayList<String[]>();
+
+		keys.add(new String[rows.length]);
+		for (int i = 0; i < rows.length; ++i){
+			keys.get(0)[i] = String.valueOf(tables[table].getValueAt(rows[i],0));
+		}
+
+		if (table == 2){
+			keys.add(new String[rows.length]);
+			for (int i = 0; i < rows.length; ++i){
+				keys.get(1)[i] = String.valueOf(tables[table].getValueAt(rows[i],1));
+			}
+		}
+
+		int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to delete selected " 
+		+ panelTitles[table] + "/s", deleteButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+		if (response == JOptionPane.YES_OPTION){
+			for (int i = 0; i < keys.get(0).length; ++i){
+				for (int j = 0; j < tableModels[table].getRowCount(); ++j){
+					String modelKey = String.valueOf(tableModels[table].getValueAt(j,0));
+					if (keys.get(0)[i].equals(modelKey)){
+
+						CallableStatement cs = null;
+						if (table == 0){
+							cs = con.prepareCall("{call delete_transcation(?)}");
+							cs.setString(1,keys.get(0)[i]);
+						}
+						else if (table == 1){
+							cs = con.prepareCall("{call delete_user(?)}");
+							cs.setString(1,keys.get(0)[i]);
+						}
+						else if (table == 2){
+							cs = con.prepareCall("{call delete_book(?,?)}");
+							cs.setString(1,keys.get(0)[i]);
+							cs.setString(2,keys.get(1)[i]);
+						}
+						else if (table == 3){
+							cs = con.prepareCall("{call delete_librarian(?)}");
+							cs.setString(1,keys.get(0)[i]);
+						}
+
+						cs.executeUpdate();
+						tableModels[table].removeRow(j);
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -507,7 +579,7 @@ public class LibrarianFrame extends JFrame {
 				sorters[i].setRowFilter(rowFilter);
 			}
 			catch (NullPointerException e) {
-
+				// Expected Exception: user search without any contents on the table
 			}
 			catch (PatternSyntaxException e) {
 				JOptionPane.showMessageDialog(rootPane,e.getMessage(),
