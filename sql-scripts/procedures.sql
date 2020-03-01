@@ -115,7 +115,7 @@ CREATE OR REPLACE PROCEDURE edit_librarian (
     book_access librarian.bookaccess%type,
     trans_access librarian.transaccess%type ) IS
 BEGIN
-    delete_librarian(old_user_id);
+    DELETE FROM librarian WHERE loginid = old_user_id;
 
     edit_user(
         old_user_id,
