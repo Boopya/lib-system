@@ -2,17 +2,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import com.sun.rowset.CachedRowSetImpl;
-import javax.sql.rowset.CachedRowSet;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.PatternSyntaxException;
 
 public class LibrarianFrame extends JFrame {
@@ -25,9 +24,9 @@ public class LibrarianFrame extends JFrame {
 	private JPanel[] panels = new JPanel[panelTitles.length];
 
 	private JTable[] tables = new JTable[panels.length];
-	private CachedRowSet[] rowSets = new CachedRowSet[tables.length];
-	private CustomTableModel[] tableModels = new CustomTableModel[tables.length];
-	private TableRowSorter<CustomTableModel>[] sorters = new TableRowSorter[tableModels.length];
+	private Object[][][] data = new Object[panels.length][][];
+	private DefaultTableModel[] tableModels = new DefaultTableModel[tables.length];
+	private TableRowSorter<DefaultTableModel>[] sorters = new TableRowSorter[tableModels.length];
 
 	private String[][] columnNames = {
 			new String[] { "Transaction ID", "Transaction Date", "Transaction Mode", "Login ID", "ISBN",
@@ -43,7 +42,7 @@ public class LibrarianFrame extends JFrame {
 	private JPanel[] searchPanels = new JPanel[panels.length];
 	private JLabel[] searchLabels = new JLabel[searchPanels.length];
 	private JTextField[] searchFields = new JTextField[searchPanels.length];
-	private JComboBox<String>[] searchBoxes = new JComboBox[searchPanels.length];
+	private JComboBox<?>[] searchBoxes = new JComboBox[searchPanels.length];
 
 	private JButton[] addButtons = new JButton[panels.length];
 	private JButton[] editButtons = new JButton[panels.length];
@@ -53,6 +52,8 @@ public class LibrarianFrame extends JFrame {
 	public LibrarianFrame(Connection con) throws SQLException {
 		this.con = con;
 		this.con.setAutoCommit(false);
+
+		data = getData(con);
 
 		setTitle("Librarian");
 
@@ -73,26 +74,22 @@ public class LibrarianFrame extends JFrame {
 				}
 			};
 
-			rowSets[i] = new CachedRowSetImpl();
-			rowSets[i].setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
-			rowSets[i].setConcurrency(ResultSet.CONCUR_UPDATABLE);
-			rowSets[i].setUsername(AccessCredentials.DATABASE_USERNAME);
-			rowSets[i].setPassword(AccessCredentials.DATABASE_PASSWORD);
-			rowSets[i].setUrl(AccessCredentials.DATABASE_HOST);
-			if (i == 1) {
-				rowSets[i].setCommand("SELECT * FROM PATRON WHERE LOGINID NOT IN (SELECT LOGINID FROM LIBRARIAN)");
-			} else if (i == 3) {
-				rowSets[i].setCommand("SELECT P.LOGINID, P.FIRSTNAME, P.MIDDLENAME, P.LASTNAME, P.PASSWORD, "
-						+ "P.HOUSENO, P.STREET, P.BARANGAY, P.CITY, P.UNPAIDFINE, "
-						+ "L.PATRONACCESS, L.LIBACCESS, L.BOOKACCESS, L.TRANSACCESS "
-						+ "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
-			} else {
-				rowSets[i].setCommand("SELECT * FROM " + panelTitles[i].toUpperCase());
-			}
-			rowSets[i].execute();
+			tableModels[i] = new DefaultTableModel(data[i], columnNames[i]) {
+				private static final long serialVersionUID = 1L;
 
-			tableModels[i] = new CustomTableModel(rowSets[i]);
-			sorters[i] = new TableRowSorter<CustomTableModel>(tableModels[i]);
+				@Override
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				}
+
+				@Override
+				public Class<?> getColumnClass(int columnIndex) {
+					return String.class;
+				}
+			};
+
+			sorters[i] = new TableRowSorter<DefaultTableModel>(tableModels[i]);
+			tableModels[i].setColumnIdentifiers(columnNames[i]);
 			tables[i].setModel(tableModels[i]);
 			tables[i].setPreferredScrollableViewportSize(new Dimension(800, 350));
 			tables[i].setFillsViewportHeight(true);
@@ -120,6 +117,9 @@ public class LibrarianFrame extends JFrame {
 			deleteButtons[i] = new JButton("Delete " + panelTitles[i]);
 			finishButtons[i] = new JButton("Finish");
 
+			addButtons[i].addActionListener(new AddListener());
+			editButtons[i].addActionListener(new EditListener());
+			deleteButtons[i].addActionListener(new DeleteListener());
 			finishButtons[i].addActionListener(new FinishListener());
 
 			constraints.gridx = 0;
@@ -176,13 +176,49 @@ public class LibrarianFrame extends JFrame {
 						con.rollback();
 					} catch (SQLException e) {
 						e.printStackTrace();
-						JOptionPane.showMessageDialog(rootPane, e.getMessage(),
-						"SQLException", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
+								JOptionPane.ERROR_MESSAGE);
 					}
 					createLoginFrame();
 				}
 			}
 		});
+	}
+
+	private Object[][][] getData(Connection con) throws SQLException {
+		Object[][][] data = new Object[panels.length][][];
+
+		for (int i = 0; i < data.length; ++i){
+			Statement statement;
+			statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs;
+			
+			if (i == 1){
+				rs = statement.executeQuery("SELECT * FROM PATRON WHERE LOGINID NOT IN (SELECT LOGINID FROM LIBRARIAN)");
+			}
+			else if (i == 3){
+				rs = statement.executeQuery("SELECT P.LOGINID, FIRSTNAME, MIDDLENAME, LASTNAME, PASSWORD, "
+				+ "HOUSENO, STREET, BARANGAY, CITY, UNPAIDFINE, "
+				+ "PATRONACCESS, LIBACCESS, BOOKACCESS, TRANSACCESS "
+				+ "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
+			}
+			else {
+				rs = statement.executeQuery("SELECT * FROM " + panelTitles[i]);
+			}
+
+			rs.last();
+			data[i] = new Object[rs.getRow()][];
+			rs.beforeFirst();
+
+			for (int j = 0; rs.next(); ++j){
+				data[i][j] = new Object[columnNames[i].length];
+				for (int k = 0; k < data[i][j].length; ++k){
+					data[i][j][k] = rs.getString(k+1);
+				}
+			}
+		}
+
+		return data;
 	}
 
 	private void createLoginFrame() {
@@ -192,6 +228,13 @@ public class LibrarianFrame extends JFrame {
 		login.setLocationRelativeTo(null);
 		login.setVisible(true);
 		dispose();
+	}
+
+	private class FinishListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			finishDialog();
+		}
 	}
 
 	private void finishDialog() {
@@ -210,8 +253,8 @@ public class LibrarianFrame extends JFrame {
 							con.commit();
 						} catch (SQLException e) {
 							e.printStackTrace();
-							JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
-							"SQLException",JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
+									JOptionPane.ERROR_MESSAGE);
 						}
 						createLoginFrame();
 
@@ -221,12 +264,11 @@ public class LibrarianFrame extends JFrame {
 							con.rollback();
 						} catch (SQLException e) {
 							e.printStackTrace();
-							JOptionPane.showMessageDialog(rootPane, e.getMessage(),
-							"SQLException", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
+									JOptionPane.ERROR_MESSAGE);
 						}
 						createLoginFrame();
-					}
-					else if (optionPane.getValue().equals(options[2])){
+					} else if (optionPane.getValue().equals(options[2])) {
 						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 						dialog.dispose();
 					}
@@ -238,100 +280,175 @@ public class LibrarianFrame extends JFrame {
 		dialog.setVisible(true);
 	}
 
-	private class FinishListener implements ActionListener {
+	private class AddListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			finishDialog();
+			for (int i = 0; i < addButtons.length; ++i) {
+				if (addButtons[i].equals((JButton) e.getSource())) {
+					createAddDialog(i);
+				}
+			}
 		}
 	}
 
-	private class CustomTableModel implements TableModel {
-		private CachedRowSet crs;
-		private ResultSetMetaData metadata;
-		private int rows, cols;
+	private void createAddDialog(int table) {
+		Object[] prompt = new Object[columnNames[table].length * 2];
 
-		public CustomTableModel(CachedRowSet crs) throws SQLException {
-			this.crs = crs;
-			this.metadata = this.crs.getMetaData();
-			cols = metadata.getColumnCount();
-			this.crs.beforeFirst();
-			this.rows = 0;
-			while (this.crs.next()) {
-				++this.rows;
-			}
-			this.crs.beforeFirst();
+		Object[] field = null;
+
+		Calendar calendar = Calendar.getInstance();
+		Date initDate = calendar.getTime();
+		calendar.add(Calendar.YEAR, -100);
+		Date startDate = calendar.getTime();
+		calendar.add(Calendar.YEAR, 200);
+		Date endDate = calendar.getTime();
+		SpinnerModel dateModel = new SpinnerDateModel(initDate, startDate, endDate, Calendar.DAY_OF_MONTH);
+		JSpinner dateSpinner = new JSpinner(dateModel);
+		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy"));
+
+		if (table == 0) {
+			field = new Object[] { new JTextField(), dateSpinner,
+					new JComboBox<String>(new String[] { "LOAN", "RETURN", "RESERVE" }), new JTextField(),
+					new JTextField(), new JTextField() };
+		} else if (table == 1) {
+			field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
+					new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(),
+					new JTextField() };
+		} else if (table == 2) {
+			field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
+					new JComboBox<String>(new String[] { "ON-SHELF", "ON-HOLD", "ON-LOAN" }), dateSpinner,
+					new JTextField() };
+		} else if (table == 3) {
+			String[] access = { "111", "110", "100", "000", "001", "011", "010", "101" };
+			field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
+					new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(),
+					new JTextField(), new JComboBox<String>(access), new JComboBox<String>(access),
+					new JComboBox<String>(access), new JComboBox<String>(access) };
 		}
 
-		public void close() {
-			try {
-				crs.getStatement().close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(rootPane, e.getMessage(),
-				"SQLException", JOptionPane.ERROR_MESSAGE);
-			}
+		for (int i = 0, j = 0; i < prompt.length; ++j) {
+			prompt[i++] = columnNames[table][j];
+			prompt[i++] = field[j];
 		}
 
-		@Override
-		protected void finalize() throws Throwable {
-			super.finalize();
-			close();
-		}
+		Object[] options = { "Save", "Cancel" };
 
-		@Override
-		public int getRowCount() {
-			return rows;
-		}
+		JOptionPane optionPane = new JOptionPane(prompt, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null,
+				options, options[0]);
 
-		@Override
-		public int getColumnCount() {
-			return cols;
-		}
+		JDialog dialog = new JDialog(this, addButtons[table].getText(), true);
+		dialog.setContentPane(optionPane);
 
-		@Override
-		public String getColumnName(int columnIndex) {
-			try {
-				return this.metadata.getColumnLabel(columnIndex + 1);
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return e.toString();
-			}
-		}
+		optionPane.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (JOptionPane.VALUE_PROPERTY.equals(event.getPropertyName())) {
+					if (optionPane.getValue().equals(options[0])) {
+						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			return String.class;
-		}
+						try {
+							String[] data = new String[columnNames[table].length];
+							CallableStatement cs = null;
+							Object[] rowData = null;
 
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return false;
-		}
+							if (table == 0) {
+								for (int i = 0, j = 0; i < data.length; ++j){
+									if (i != 1 && i != 2){
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else if (i == 1){
+										data[i++] = new SimpleDateFormat("dd/MM/yyyy")
+										.format(((JSpinner)prompt[++j]).getValue());
+									}
+									else {	// Index 2
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+								}
 
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			try {
-				this.crs.absolute(rowIndex + 1);
-				Object obj = this.crs.getObject(columnIndex + 1);
-				if (obj == null) {
-					return null;
-				} else {
-					return obj.toString();
+								cs = con.prepareCall("{call add_transaction(?,to_date(?,'dd/MM/YYYY'),?,?,?,?)}");
+
+							} else if (table == 1) {
+								for (int i = 0, j = 0; i < data.length; ++j) {
+									data[i++] = ((JTextField) prompt[++j]).getText();
+								}
+
+								cs = con.prepareCall("{call add_user(?,?,?,?,?,?,?,?,?,?)}");
+
+							} else if (table == 2) {
+								for (int i = 0, j = 0; i < data.length; ++j){
+									if (i != 4 && i != 5){
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else if (i == 4){
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+									else {	// Index 5
+										data[i++] = new SimpleDateFormat("dd/MM/yyyy")
+										.format(((JSpinner)prompt[++j]).getValue());
+									}
+								}
+
+								cs = con.prepareCall("{call add_book(?,?,?,?,?,to_date(?,'dd/MM/YYYY'),?)}");
+
+							} else if (table == 3) {
+								for (int i = 0, j = 0; i < data.length; ++j) {
+									if (i < data.length - 4) {
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else {
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+								}
+
+								cs = con.prepareCall("{call add_librarian(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+							}
+
+							rowData = new Object[data.length];
+							for (int i = 0; i < data.length; ++i) {
+								cs.setString(i + 1, data[i]);
+								rowData[i] = data[i];
+							}
+
+							cs.executeUpdate();
+							tableModels[table].addRow(rowData);
+							dialog.dispose();
+
+							JOptionPane.showMessageDialog(rootPane,panelTitles[table] + " Added!", 
+							addButtons[table].getText(),JOptionPane.INFORMATION_MESSAGE);
+						} 
+						catch (SQLException e) {
+							e.printStackTrace();
+							JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
+									JOptionPane.ERROR_MESSAGE);
+						}
+					} else if (optionPane.getValue().equals(options[1])) {
+						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+						dialog.dispose();
+					}
 				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return e.toString();
 			}
+		});
+
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
+	}
+
+	private class EditListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
 		}
+	}
 
+	private class DeleteListener implements ActionListener {
 		@Override
-		public void setValueAt(Object aValue, int rowIndex, int columnIndex) { }
+		public void actionPerformed(ActionEvent e) {
 
-		@Override
-		public void addTableModelListener(TableModelListener l) { }
-
-		@Override
-		public void removeTableModelListener(TableModelListener l) { }
+		}
 	}
 
 	private class SearchListener extends KeyAdapter implements DocumentListener, ItemListener {
@@ -349,7 +466,7 @@ public class LibrarianFrame extends JFrame {
 		@Override
 		public void itemStateChanged(ItemEvent e) {
 			for (int i = 0; i < searchBoxes.length; ++i){
-				if (searchBoxes[i].equals((JComboBox<String>)e.getSource())){
+				if (searchBoxes[i].equals((JComboBox<?>)e.getSource())){
 					search(i);
 				}
 			}
@@ -384,7 +501,7 @@ public class LibrarianFrame extends JFrame {
 
 		private void search(int i){
 			try {
-				RowFilter<CustomTableModel,Object> rowFilter = null;
+				RowFilter<DefaultTableModel,Object> rowFilter = null;
 				rowFilter = RowFilter.regexFilter("(?i)" + searchFields[i].getText(), 
 				searchBoxes[i].getSelectedIndex());
 				sorters[i].setRowFilter(rowFilter);
