@@ -141,8 +141,8 @@ END edit_librarian;
 CREATE OR REPLACE PROCEDURE delete_librarian (
    user_id patron.loginid%type ) IS
 BEGIN
-    delete_user(user_id);
     DELETE FROM librarian WHERE loginid = user_id;
+    delete_user(user_id);
 END delete_librarian;
 /
 
@@ -200,6 +200,55 @@ BEGIN
 END delete_book;
 /
 
+
+-- TRANSACTION GENERAL PROCEDURE --
+CREATE OR REPLACE PROCEDURE add_transaction (
+    p_transid transaction.transactionid%type,
+    p_transdate transaction.transactiondate%type,
+    p_transmode transaction.transactionmode%type,
+    p_loginid transaction.patron_loginid%type,
+    p_isbn transaction.book_isbn%type,
+    p_cpnum transaction.book_copynumber%type ) IS
+BEGIN
+    INSERT INTO transaction VALUES (
+        p_transid,
+        p_transdate,
+        p_transmode,
+        p_loginid,
+        p_isbn,
+        p_cpnum);
+END add_transaction;
+/
+
+CREATE OR REPLACE PROCEDURE edit_transaction (
+    old_transid transaction.transactionid%type,
+    p_transid transaction.transactionid%type,
+    p_transdate transaction.transactiondate%type,
+    p_transmode transaction.transactionmode%type,
+    p_loginid transaction.patron_loginid%type,
+    p_isbn transaction.book_isbn%type,
+    p_cpnum transaction.book_copynumber%type ) IS
+BEGIN
+    UPDATE transaction SET
+        transactionid = p_transid,
+        transactiondate = p_transdate,
+        transactionmode = p_transmode,
+        patron_loginid = p_loginid,
+        book_isbn = p_isbn,
+        book_copynumber = p_cpnum
+    WHERE transactionid = old_transid;
+END edit_transaction;
+/
+
+CREATE OR REPLACE PROCEDURE delete_transaction (
+    p_transid transaction.transactionid%type ) IS
+BEGIN
+    DELETE from transaction 
+        WHERE transactionid = p_transid;
+END delete_transaction;
+/
+
+
 -- LOAN/RETURN/RESERVE HELPER PROCEDURES --
 CREATE OR REPLACE PROCEDURE update_user_penalty (
     p_loginid patron.loginid%type,
@@ -223,25 +272,6 @@ BEGIN
     WHERE isbn = p_isbn AND 
           copynumber = p_cpnum;
 END update_book_status;
-/
-
--- TRANSACTION CREATION PROCEDURE --
-CREATE OR REPLACE PROCEDURE add_transaction (
-    p_transid transaction.transactionid%type,
-    p_transdate transaction.transactiondate%type,
-    p_transmode transaction.transactionmode%type,
-    p_loginid transaction.patron_loginid%type,
-    p_isbn transaction.book_isbn%type,
-    p_cpnum transaction.book_copynumber%type ) IS
-BEGIN
-    INSERT INTO transaction VALUES (
-        p_transid,
-        p_transdate,
-        p_transmode,
-        p_loginid,
-        p_isbn,
-        p_cpnum);
-END add_transaction;
 /
 
 -- LOAN BOOK PROCEDURE --
