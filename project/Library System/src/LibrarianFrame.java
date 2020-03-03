@@ -16,57 +16,118 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
-public class LibrarianFrame extends JFrame {
+public class LibrarianFrame extends JFrame  {
 	private static final long serialVersionUID = 1L;
 	private Connection con;
+	private JTabbedPane tablesTabbedPane;
+	private JPanel[] panels;
+	private JTable[] tables;
+	private String[] tableNames;
+	private String[][] columnNames;
+	private Object[][][] data;
+	private JPanel[] searchPanels;
+	private JLabel[] searchLabels;
+	private JTextField[] searchFields;
+	private JComboBox<?>[] searchBoxes;
+	private JButton[] addButtons;
+	private JButton[] editButtons;
+	private JButton[] deleteButtons;
+	private JButton[] finishButtons;
+	private DefaultTableModel[] tableModels;
+	private TableRowSorter<DefaultTableModel>[] sorters;
 
-	private JTabbedPane tabbedPane;
-
-	private String[] panelTitles = { "Transaction", "Patron", "Book", "Librarian" };
-	private JPanel[] panels = new JPanel[panelTitles.length];
-
-	private JTable[] tables = new JTable[panels.length];
-	private Object[][][] data = new Object[panels.length][][];
-	private DefaultTableModel[] tableModels = new DefaultTableModel[tables.length];
-	private TableRowSorter<DefaultTableModel>[] sorters = new TableRowSorter[tableModels.length];
-
-	private String[][] columnNames = {
-			new String[] { "Transaction ID", "Transaction Date", "Transaction Mode", "Login ID", "ISBN",
-					"Copy Number" },
-			new String[] { "Login ID", "First Name", "Middle Name", "Last Name", "Password", "House No.", "Street",
-					"Barangay", "City", "Unpaid Fine" },
-			new String[] { "ISBN", "Copy Number", "Title", "Year of Publication", "Current Status", "Status Date",
-					"Shelf ID" },
-			new String[] { "Login ID", "First Name", "Middle Name", "Last Name", "Password", "House No.", "Street",
-					"Barangay", "City", "Unpaid Fine", "Patron Access", "Librarian Access", "Book Access",
-					"Transaction Access" } };
-
-	private JPanel[] searchPanels = new JPanel[panels.length];
-	private JLabel[] searchLabels = new JLabel[searchPanels.length];
-	private JTextField[] searchFields = new JTextField[searchPanels.length];
-	private JComboBox<?>[] searchBoxes = new JComboBox[searchPanels.length];
-
-	private JButton[] addButtons = new JButton[panels.length];
-	private JButton[] editButtons = new JButton[panels.length];
-	private JButton[] deleteButtons = new JButton[panels.length];
-	private JButton[] finishButtons = new JButton[panels.length];
-
-	public LibrarianFrame(Connection con) throws SQLException {
+	public LibrarianFrame(Connection con) {
 		this.con = con;
-		this.con.setAutoCommit(false);
-
-		data = getData(con);
-
 		setTitle("Librarian");
+		
+		tableNames = 
+			new String[] {DatabaseContract.TRANSACTION_TABLE,
+						  DatabaseContract.PATRON_TABLE,
+						  DatabaseContract.BOOK_TABLE,
+						  DatabaseContract.LIBRARIAN_TABLE};
+		
+		columnNames = new String[][]{
+			new String[] {DatabaseContract.TransactionTable.TRANSACTION_ID_COLUMN,
+						  DatabaseContract.TransactionTable.TRANSACTION_DATE_COLUMN,
+						  DatabaseContract.TransactionTable.TRANSACTION_MODE_COLUMN,
+						  DatabaseContract.TransactionTable.LOGIN_ID_COLUMN,
+						  DatabaseContract.TransactionTable.ISBN_COLUMN,
+						  DatabaseContract.TransactionTable.COPY_NUMBER_COLUMN},
+		
+			new String[] {DatabaseContract.PatronTable.LOGIN_ID_COLUMN,
+						  DatabaseContract.PatronTable.FIRST_NAME_COLUMN,
+						  DatabaseContract.PatronTable.MIDDLE_NAME_COLUMN,
+						  DatabaseContract.PatronTable.LAST_NAME_COLUMN,
+						  DatabaseContract.PatronTable.PASSWORD_COLUMN,
+						  DatabaseContract.PatronTable.HOUSE_NO_COLUMN,
+						  DatabaseContract.PatronTable.STREET_COLUMN,
+						  DatabaseContract.PatronTable.BARANGAY_COLUMN,
+						  DatabaseContract.PatronTable.CITY_COLUMN,
+						  DatabaseContract.PatronTable.UNPAID_FINE_COLUMN},
+			
+			new String[] {DatabaseContract.BookTable.ISBN_COLUMN,
+						  DatabaseContract.BookTable.COPY_NUMBER_COLUMN,
+						  DatabaseContract.BookTable.TITLE_COLUMN,
+						  DatabaseContract.BookTable.YEAR_OF_PUBLICATION_COLUMN,
+						  DatabaseContract.BookTable.CURRENT_STATUS_COLUMN,
+						  DatabaseContract.BookTable.STATUS_DATE_COLUMN,
+						  DatabaseContract.BookTable.SHELF_ID_COLUMN},
+			
+			new String[] {DatabaseContract.LibrarianTable.LOGIN_ID_COLUMN,
+						  DatabaseContract.LibrarianTable.FIRST_NAME_COLUMN,
+						  DatabaseContract.LibrarianTable.MIDDLE_NAME_COLUMN,
+						  DatabaseContract.LibrarianTable.LAST_NAME_COLUMN,
+						  DatabaseContract.LibrarianTable.PASSWORD_COLUMN,
+						  DatabaseContract.LibrarianTable.HOUSE_NO_COLUMN,
+						  DatabaseContract.LibrarianTable.STREET_COLUMN,
+						  DatabaseContract.LibrarianTable.BARANGAY_COLUMN,
+						  DatabaseContract.LibrarianTable.CITY_COLUMN,
+						  DatabaseContract.LibrarianTable.UNPAID_FINE_COLUMN,
+						  DatabaseContract.LibrarianTable.PATRON_ACCESS_COLUMN,
+						  DatabaseContract.LibrarianTable.LIBRARIAN_ACCESS_COLUMN,
+						  DatabaseContract.LibrarianTable.BOOK_ACCESS_COLUMN,
+						  DatabaseContract.LibrarianTable.TRANSACTION_ACCESS_COLUMN}
+		};
+		
+		// tables
+		panels = new JPanel[tableNames.length];
+		tables = new JTable[tableNames.length];
+		data = new Object[tables.length][][];
+		tableModels = new DefaultTableModel[tables.length];
+		sorters = new TableRowSorter[tableModels.length];
+		
+		// for search tool
+		searchPanels = new JPanel[tables.length];
+		searchLabels = new JLabel[tables.length];
+		searchFields = new JTextField[tables.length];
+		searchBoxes = new JComboBox[tables.length];
+		
+		// buttons
+		addButtons = new JButton[tables.length];
+		editButtons = new JButton[tables.length];
+		deleteButtons = new JButton[tables.length];
+		finishButtons = new JButton[tables.length];
 
-		tabbedPane = new JTabbedPane();
+		initComponents();
+	}
+	
+	public void initComponents() {
+		try {
+			con.setAutoCommit(false);
+			data = getData(con);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		tablesTabbedPane = new JTabbedPane();
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.insets = new Insets(10, 10, 10, 10);
 
 		for (int i = 0; i < panels.length; ++i) {
 			panels[i] = new JPanel(new GridBagLayout());
-			tabbedPane.add(panelTitles[i], panels[i]);
+			tablesTabbedPane.add(tableNames[i], panels[i]);
 
 			tables[i] = new JTable() {
 				private static final long serialVersionUID = 1L;
@@ -115,9 +176,9 @@ public class LibrarianFrame extends JFrame {
 			searchPanels[i].add(searchFields[i]);
 			searchPanels[i].add(searchBoxes[i]);
 
-			addButtons[i] = new JButton("Add " + panelTitles[i]);
-			editButtons[i] = new JButton("Edit " + panelTitles[i]);
-			deleteButtons[i] = new JButton("Delete " + panelTitles[i]);
+			addButtons[i] = new JButton("Add " + tableNames[i]);
+			editButtons[i] = new JButton("Edit " + tableNames[i]);
+			deleteButtons[i] = new JButton("Delete " + tableNames[i]);
 			finishButtons[i] = new JButton("Finish");
 
 			addButtons[i].addActionListener(new AddListener());
@@ -163,9 +224,9 @@ public class LibrarianFrame extends JFrame {
 			panels[i].add(finishButtons[i], constraints);
 		}
 
-		tabbedPane.setFocusable(false);
+		tablesTabbedPane.setFocusable(false);
 
-		add(tabbedPane);
+		add(tablesTabbedPane);
 
 		pack();
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -205,7 +266,7 @@ public class LibrarianFrame extends JFrame {
 				+ "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
 			}
 			else {
-				rs = statement.executeQuery("SELECT * FROM " + panelTitles[i]);
+				rs = statement.executeQuery("SELECT * FROM " + tableNames[i]);
 			}
 
 			rs.last();
@@ -240,9 +301,8 @@ public class LibrarianFrame extends JFrame {
 	}
 
 	private void finishDialog() {
-		Object[] options = { "Save", "Don't Save", "Cancel" };
-		JOptionPane optionPane = new JOptionPane("Do you want to save your changes?", 
-		JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options);
+		Object[] options = {"Save", "Don't Save", "Cancel"};
+		JOptionPane optionPane = new JOptionPane("Do you want to save your changes?", JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options);
 		JDialog dialog = new JDialog(this, "Finish", true);
 		dialog.setContentPane(optionPane);
 		optionPane.addPropertyChangeListener(new PropertyChangeListener() {
@@ -477,7 +537,7 @@ public class LibrarianFrame extends JFrame {
 							tableModels[table].addRow(data);
 							dialog.dispose();
 
-							JOptionPane.showMessageDialog(rootPane,panelTitles[table] + " Added!", 
+							JOptionPane.showMessageDialog(rootPane,tableNames[table] + " Added!", 
 							addButtons[table].getText(),JOptionPane.INFORMATION_MESSAGE);
 						} 
 						catch (SQLException e) {
@@ -760,7 +820,7 @@ public class LibrarianFrame extends JFrame {
 
 								dialog.dispose();
 
-								JOptionPane.showMessageDialog(rootPane, panelTitles[table] + " Updated!", 
+								JOptionPane.showMessageDialog(rootPane, tableNames[table] + " Updated!", 
 								editButtons[table].getText(), JOptionPane.INFORMATION_MESSAGE);
 							}
 						}
@@ -819,7 +879,7 @@ public class LibrarianFrame extends JFrame {
 		}
 
 		int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to delete selected " 
-		+ panelTitles[table] + "/s", deleteButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		+ tableNames[table] + "/s", deleteButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 		if (response == JOptionPane.YES_OPTION){
 			for (int i = 0; i < keys.get(0).length; ++i){
@@ -853,7 +913,7 @@ public class LibrarianFrame extends JFrame {
 				}
 			}
 
-			JOptionPane.showMessageDialog(rootPane, panelTitles[table] + " Deleted!",
+			JOptionPane.showMessageDialog(rootPane, tableNames[table] + " Deleted!",
 			deleteButtons[table].getText(), JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

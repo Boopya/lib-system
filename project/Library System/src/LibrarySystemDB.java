@@ -6,8 +6,8 @@ import javax.swing.UIManager;
 
 public class LibrarySystemDB implements AccessCredentials{
     public static void main(String[] args) {
-        LoginFrame login = null;
-
+		LoginFrame loginFrame = null;
+		
         try {
             // initialize database driver
             Class.forName("oracle.jdbc.OracleDriver");
@@ -15,28 +15,25 @@ public class LibrarySystemDB implements AccessCredentials{
             // attempt to get connection to the database
             Connection con = DriverManager.getConnection(DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD);
             
-            // create a Statement object for conveying SQL statements
-            // Statement statement = con.createStatement();
-            
             // connection checker
             System.out.println("Connected successfully.");
 
-            login = new LoginFrame(con);
+            loginFrame = new LoginFrame(con);
 
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-            login.setSize(300,200);
-            login.setResizable(false);
-            login.setLocationRelativeTo(null);
-            login.setVisible(true);
+            loginFrame.setSize(300,200);
+            loginFrame.setResizable(false);
+            loginFrame.setLocationRelativeTo(null);
+            loginFrame.setVisible(true);
         }
         catch (SQLException | ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(login,"SQLException:\n" 
+            JOptionPane.showMessageDialog(loginFrame,"SQLException:\n" 
             + e.getMessage(),"Exception",JOptionPane.ERROR_MESSAGE);
         }
         catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(login,e.getMessage(),
+            JOptionPane.showMessageDialog(loginFrame,e.getMessage(),
             "Exception",JOptionPane.ERROR_MESSAGE);
         }
     }
