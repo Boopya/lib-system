@@ -192,8 +192,6 @@ public class LoginFrame extends JFrame implements SQLStatements{
 		
 		JDialog dialog = new JDialog(this, "Librarian Detected", true);
 		dialog.setContentPane(selectModeInterfacePane);
-		dialog.setLocationRelativeTo(rootPane);
-		dialog.setVisible(true);
 		
 		selectModeInterfacePane.addPropertyChangeListener(new PropertyChangeListener(){
 			@Override
@@ -212,6 +210,8 @@ public class LoginFrame extends JFrame implements SQLStatements{
 		});
 		
 		dialog.pack();
+		dialog.setLocationRelativeTo(rootPane);
+		dialog.setVisible(true);
 	}
 
 	private void showPatronFrame(){
