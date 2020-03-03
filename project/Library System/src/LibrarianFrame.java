@@ -112,192 +112,191 @@ public class LibrarianFrame extends JFrame  {
     }
 	
     public void initComponents() {
-            try {
-                    con.setAutoCommit(false);
-                    data = getData(con);
-            }
-            catch(SQLException e) {
-                    e.printStackTrace();
-            }
+        try {
+            con.setAutoCommit(false);
+            data = getData(con);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
 
-            tablesTabbedPane = new JTabbedPane();
+        tablesTabbedPane = new JTabbedPane();
 
-            GridBagConstraints constraints = new GridBagConstraints();
-            constraints.insets = new Insets(10, 10, 10, 10);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 10, 10, 10);
 
-            for (int i = 0; i < panels.length; ++i) {
-                    panels[i] = new JPanel(new GridBagLayout());
-                    tablesTabbedPane.add(tableNames[i], panels[i]);
+        for (int i = 0; i < panels.length; ++i) {
+            panels[i] = new JPanel(new GridBagLayout());
+            tablesTabbedPane.add(tableNames[i], panels[i]);
 
-                    tables[i] = new JTable() {
-                            private static final long serialVersionUID = 1L;
+            tables[i] = new JTable() {
+                private static final long serialVersionUID = 1L;
 
-                            public boolean getScrollableTracksViewportWidth() {
-                                    return getPreferredSize().width < getParent().getWidth();
-                            }
-                    };
+                public boolean getScrollableTracksViewportWidth() {
+                    return getPreferredSize().width < getParent().getWidth();
+                }
+            };
 
-                    tableModels[i] = new DefaultTableModel(data[i], columnNames[i]) {
-                            private static final long serialVersionUID = 1L;
+            tableModels[i] = new DefaultTableModel(data[i], columnNames[i]) {
+                private static final long serialVersionUID = 1L;
 
-                            @Override
-                            public boolean isCellEditable(int row, int column) {
-                                    return false;
-                            }
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
 
-                            @Override
-                            public Class<?> getColumnClass(int columnIndex) {
-                                    return String.class;
-                            }
-                    };
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    return String.class;
+                }
+            };
 
-                    sorters[i] = new TableRowSorter<DefaultTableModel>(tableModels[i]);
-                    tableModels[i].setColumnIdentifiers(columnNames[i]);
-                    tables[i].setModel(tableModels[i]);
-                    tables[i].setPreferredScrollableViewportSize(new Dimension(800, 350));
-                    tables[i].setFillsViewportHeight(true);
-                    tables[i].getTableHeader().setReorderingAllowed(false);
-                    tables[i].getTableHeader().setResizingAllowed(false);
-                    tables[i].setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-                    tables[i].setRowSorter(sorters[i]);
+            sorters[i] = new TableRowSorter<DefaultTableModel>(tableModels[i]);
+            tableModels[i].setColumnIdentifiers(columnNames[i]);
+            tables[i].setModel(tableModels[i]);
+            tables[i].setPreferredScrollableViewportSize(new Dimension(800, 350));
+            tables[i].setFillsViewportHeight(true);
+            tables[i].getTableHeader().setReorderingAllowed(false);
+            tables[i].getTableHeader().setResizingAllowed(false);
+            tables[i].setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            tables[i].setRowSorter(sorters[i]);
 
-                    searchLabels[i] = new JLabel("Search:");
-                    searchFields[i] = new JTextField();
-                    searchFields[i].setPreferredSize(new Dimension(300, 20));
-                    searchBoxes[i] = new JComboBox<String>(columnNames[i]);
-                    searchBoxes[i].setSelectedIndex(0);
+            searchLabels[i] = new JLabel("Search:");
+            searchFields[i] = new JTextField();
+            searchFields[i].setPreferredSize(new Dimension(300, 20));
+            searchBoxes[i] = new JComboBox<String>(columnNames[i]);
+            searchBoxes[i].setSelectedIndex(0);
 
-                    searchFields[i].getDocument().addDocumentListener(new SearchListener());
-                    searchFields[i].addKeyListener(new SearchListener());
-                    searchBoxes[i].addItemListener(new SearchListener());
+            searchFields[i].getDocument().addDocumentListener(new SearchListener());
+            searchFields[i].addKeyListener(new SearchListener());
+            searchBoxes[i].addItemListener(new SearchListener());
 
-                    searchPanels[i] = new JPanel(new FlowLayout(FlowLayout.CENTER));
-                    searchPanels[i].add(searchLabels[i]);
-                    searchPanels[i].add(searchFields[i]);
-                    searchPanels[i].add(searchBoxes[i]);
+            searchPanels[i] = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            searchPanels[i].add(searchLabels[i]);
+            searchPanels[i].add(searchFields[i]);
+            searchPanels[i].add(searchBoxes[i]);
 
-                    addButtons[i] = new JButton("Add " + tableNames[i]);
-                    editButtons[i] = new JButton("Edit " + tableNames[i]);
-                    deleteButtons[i] = new JButton("Delete " + tableNames[i]);
-                    finishButtons[i] = new JButton("Finish");
+            addButtons[i] = new JButton("Add " + tableNames[i]);
+            editButtons[i] = new JButton("Edit " + tableNames[i]);
+            deleteButtons[i] = new JButton("Delete " + tableNames[i]);
+            finishButtons[i] = new JButton("Finish");
 
-                    addButtons[i].addActionListener(new AddListener());
-                    editButtons[i].addActionListener(new EditListener());
-                    deleteButtons[i].addActionListener(new DeleteListener());
-                    finishButtons[i].addActionListener(new FinishListener());
+            addButtons[i].addActionListener(new AddListener());
+            editButtons[i].addActionListener(new EditListener());
+            deleteButtons[i].addActionListener(new DeleteListener());
+            finishButtons[i].addActionListener(new FinishListener());
 
-                    constraints.gridx = 0;
-                    constraints.gridy = 0;
-                    constraints.anchor = GridBagConstraints.CENTER;
-                    constraints.gridwidth = 4;
-                    panels[i].add(searchPanels[i], constraints);
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.anchor = GridBagConstraints.CENTER;
+            constraints.gridwidth = 4;
+            panels[i].add(searchPanels[i], constraints);
 
-                    constraints.gridx = 0;
-                    constraints.gridy = 1;
-                    constraints.anchor = GridBagConstraints.CENTER;
-                    constraints.gridwidth = 4;
-                    panels[i].add(new JScrollPane(tables[i], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), constraints);
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.anchor = GridBagConstraints.CENTER;
+            constraints.gridwidth = 4;
+            panels[i].add(new JScrollPane(tables[i], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), constraints);
 
-                    constraints.gridx = 0;
-                    constraints.gridy = 2;
-                    constraints.anchor = GridBagConstraints.WEST;
-                    constraints.gridwidth = 1;
-                    panels[i].add(addButtons[i], constraints);
+            constraints.gridx = 0;
+            constraints.gridy = 2;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.gridwidth = 1;
+            panels[i].add(addButtons[i], constraints);
 
-                    constraints.gridx = 1;
-                    constraints.gridy = 2;
-                    constraints.anchor = GridBagConstraints.WEST;
-                    constraints.gridwidth = 1;
-                    panels[i].add(editButtons[i], constraints);
+            constraints.gridx = 1;
+            constraints.gridy = 2;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.gridwidth = 1;
+            panels[i].add(editButtons[i], constraints);
 
-                    constraints.gridx = 2;
-                    constraints.gridy = 2;
-                    constraints.anchor = GridBagConstraints.WEST;
-                    constraints.gridwidth = 1;
-                    panels[i].add(deleteButtons[i], constraints);
+            constraints.gridx = 2;
+            constraints.gridy = 2;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.gridwidth = 1;
+            panels[i].add(deleteButtons[i], constraints);
 
-                    constraints.gridx = 3;
-                    constraints.gridy = 2;
-                    constraints.anchor = GridBagConstraints.EAST;
-                    constraints.gridwidth = 1;
-                    panels[i].add(finishButtons[i], constraints);
-            }
+            constraints.gridx = 3;
+            constraints.gridy = 2;
+            constraints.anchor = GridBagConstraints.EAST;
+            constraints.gridwidth = 1;
+            panels[i].add(finishButtons[i], constraints);
+        }
 
-            tablesTabbedPane.setFocusable(false);
+        tablesTabbedPane.setFocusable(false);
 
-            add(tablesTabbedPane);
+        add(tablesTabbedPane);
 
-            pack();
-            setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-            addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent event) {
-                            int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to exit?", "Exit",
-                                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                            if (response == JOptionPane.YES_OPTION) {
-                                    try {
-                                            con.rollback();
-                                    } catch (SQLException e) {
-                                            JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
-                                                            JOptionPane.ERROR_MESSAGE);
-                                    }
-                                    createLoginFrame();
-                            }
+        pack();
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to exit?", "Exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                
+                if (response == JOptionPane.YES_OPTION) {
+                    try {
+                        con.rollback();
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException", JOptionPane.ERROR_MESSAGE);
                     }
-            });
+                    createLoginFrame();
+                }
+            }
+        });
     }
 
     private Object[][][] getData(Connection con) throws SQLException {
-            Object[][][] data = new Object[panels.length][][];
+        Object[][][] data = new Object[panels.length][][];
 
-            for (int i = 0; i < data.length; ++i){
-                    Statement statement;
-                    statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                    ResultSet rs;
+        for (int i = 0; i < data.length; ++i){
+            Statement statement;
+            statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs;
 
-                    if (i == 1){
-                            rs = statement.executeQuery("SELECT * FROM PATRON WHERE LOGINID NOT IN (SELECT LOGINID FROM LIBRARIAN)");
-                    }
-                    else if (i == 3){
-                            rs = statement.executeQuery("SELECT P.LOGINID, FIRSTNAME, MIDDLENAME, LASTNAME, PASSWORD, "
-                            + "HOUSENO, STREET, BARANGAY, CITY, UNPAIDFINE, "
-                            + "PATRONACCESS, LIBACCESS, BOOKACCESS, TRANSACCESS "
-                            + "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
-                    }
-                    else {
-                            rs = statement.executeQuery("SELECT * FROM " + tableNames[i]);
-                    }
-
-                    rs.last();
-                    data[i] = new Object[rs.getRow()][];
-                    rs.beforeFirst();
-
-                    for (int j = 0; rs.next(); ++j){
-                            data[i][j] = new Object[columnNames[i].length];
-                            for (int k = 0; k < data[i][j].length; ++k){
-                                    data[i][j][k] = rs.getString(k+1);
-                            }
-                    }
+            if (i == 1){
+                rs = statement.executeQuery("SELECT * FROM PATRON WHERE LOGINID NOT IN (SELECT LOGINID FROM LIBRARIAN)");
+            }
+            else if (i == 3){
+                rs = statement.executeQuery("SELECT P.LOGINID, FIRSTNAME, MIDDLENAME, LASTNAME, PASSWORD, "
+                + "HOUSENO, STREET, BARANGAY, CITY, UNPAIDFINE, "
+                + "PATRONACCESS, LIBACCESS, BOOKACCESS, TRANSACCESS "
+                + "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
+            }
+            else {
+                rs = statement.executeQuery("SELECT * FROM " + tableNames[i]);
             }
 
-            return data;
+            rs.last();
+            data[i] = new Object[rs.getRow()][];
+            rs.beforeFirst();
+
+            for (int j = 0; rs.next(); ++j){
+                data[i][j] = new Object[columnNames[i].length];
+                for (int k = 0; k < data[i][j].length; ++k){
+                    data[i][j][k] = rs.getString(k+1);
+                }
+            }
+        }
+
+        return data;
     }
 
     private void createLoginFrame() {
-            LoginFrame login = new LoginFrame(con);
-            login.setSize(300, 200);
-            login.setResizable(false);
-            login.setLocationRelativeTo(null);
-            login.setVisible(true);
-            dispose();
+        LoginFrame login = new LoginFrame(con);
+        login.setSize(300, 200);
+        login.setResizable(false);
+        login.setLocationRelativeTo(null);
+        login.setVisible(true);
+        dispose();
     }
 
     private class FinishListener implements ActionListener {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                    finishDialog();
-            }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            finishDialog();
+        }
     }
 
     private void finishDialog() {
@@ -420,14 +419,15 @@ public class LibrarianFrame extends JFrame  {
                                    new JComboBox<String>(loginID), new JComboBox<String>(isbn), 
                                    new JComboBox<String>(copynumber) };
 
-        } else if (table == 1) {
-
+        }
+        
+        else if (table == 1) {
             field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
                     new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(),
                     new JTextField() };
-
-        } else if (table == 2) {
-
+        }
+        
+        else if (table == 2) {
             rs = statement.executeQuery("SELECT SHELFID FROM SHELF");
 
             Vector<String> shelfID = new Vector<String>();
@@ -439,9 +439,9 @@ public class LibrarianFrame extends JFrame  {
             field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
                     new JComboBox<String>(new String[] { "ON-SHELF", "ON-HOLD", "ON-LOAN" }), dateSpinner,
                     new JComboBox<String>(shelfID) };
-
-        } else if (table == 3) {
-
+        } 
+        
+        else if (table == 3) {
             String[] access = { "111", "110", "100", "000", "001", "011", "010", "101" };
 
             field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
@@ -610,8 +610,7 @@ public class LibrarianFrame extends JFrame  {
         statement = con.createStatement();
         ResultSet rs;
 
-        if (table == 0){
-
+        if(table == 0) {
             dateSpinner.setValue(new SimpleDateFormat("yyyy-MM-dd")
             .parse(values[1].substring(0,10)));
 
@@ -636,40 +635,40 @@ public class LibrarianFrame extends JFrame  {
                     boolean isCopyNumDuplicate = false;
 
                     for (String isbn : vectors[1]){
-                            if (isbn.equals(rs.getString(1))){
-                                    isISBNDuplicate = true;
-                                    break;
-                            }
+                        if (isbn.equals(rs.getString(1))){
+                            isISBNDuplicate = true;
+                            break;
+                        }
                     }
 
                     for (String cpnum : vectors[2]){
-                            if (cpnum.equals(rs.getString(2))){
-                                    isCopyNumDuplicate = true;
-                                    break;
-                            }
+                        if (cpnum.equals(rs.getString(2))){
+                            isCopyNumDuplicate = true;
+                            break;
+                        }
                     }
 
                     if (!isISBNDuplicate){
-                            vectors[1].add(rs.getString(1));
+                        vectors[1].add(rs.getString(1));
                     }
 
                     if (!isCopyNumDuplicate){
-                            vectors[2].add(rs.getString(2));
+                        vectors[2].add(rs.getString(2));
                     }
             }
 
             for (int i = 0; i < comboBoxes.length; ++i){
-                    comboBoxes[i] = new JComboBox<String>(vectors[i]);
-                    comboBoxes[i].setSelectedItem(values[3+i]);
+                comboBoxes[i] = new JComboBox<String>(vectors[i]);
+                comboBoxes[i].setSelectedItem(values[3+i]);
             }
 
             field = new Object[] { 
-                    new JTextField(values[0]), dateSpinner, modes,
-                    comboBoxes[0], comboBoxes[1], comboBoxes[2] };
+                new JTextField(values[0]), dateSpinner, modes,
+                comboBoxes[0], comboBoxes[1], comboBoxes[2] };
 
         }
         
-        else if (table == 1){
+        else if(table == 1) {
             field = new Object[] { 
                     new JTextField(values[0]), new JTextField(values[1]),
                     new JTextField(values[2]), new JTextField(values[3]),
@@ -678,7 +677,7 @@ public class LibrarianFrame extends JFrame  {
                     new JTextField(values[8]), new JTextField(values[9]) };
         }
         
-        else if (table == 2){
+        else if(table == 2) {
             dateSpinner.setValue(new SimpleDateFormat("yyyy-MM-dd")
             .parse(values[5].substring(0,10)));
 
@@ -702,7 +701,7 @@ public class LibrarianFrame extends JFrame  {
                     status, dateSpinner, shelfBox };
         }
         
-        else if (table == 3){
+        else if(table == 3) {
             String[] access = { "111", "110", "100", "000", "001", "011", "010", "101" };
 
             JComboBox<?>[] comboBoxes = new JComboBox[4];
@@ -721,7 +720,7 @@ public class LibrarianFrame extends JFrame  {
                     comboBoxes[0], comboBoxes[1], comboBoxes[2], comboBoxes[3]};
         }
 
-        for (int i = 0, j = 0; i < prompt.length; ++j) {
+        for(int i = 0, j = 0; i < prompt.length; ++j) {
             prompt[i++] = columnNames[table][j];
             prompt[i++] = field[j];
         }
