@@ -115,6 +115,8 @@ CREATE OR REPLACE PROCEDURE edit_librarian (
     book_access librarian.bookaccess%type,
     trans_access librarian.transaccess%type ) IS
 BEGIN
+    DELETE FROM librarian WHERE loginid = old_user_id;
+
     edit_user(
         old_user_id,
         user_id,
@@ -128,13 +130,12 @@ BEGIN
         user_city,
         user_unpaid);
         
-    UPDATE librarian SET
-        loginid = user_id,
-        patronaccess = patron_access,
-        libaccess = lib_access,
-        bookaccess = book_access,
-        transaccess = trans_access
-    WHERE loginid = old_user_id;
+    INSERT INTO librarian VALUES (
+        user_id,
+        patron_access,
+        lib_access,
+        book_access,
+        trans_access);
 END edit_librarian;
 /
 

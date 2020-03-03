@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -95,6 +96,7 @@ public class LibrarianFrame extends JFrame {
 			tables[i].setPreferredScrollableViewportSize(new Dimension(800, 350));
 			tables[i].setFillsViewportHeight(true);
 			tables[i].getTableHeader().setReorderingAllowed(false);
+			tables[i].getTableHeader().setResizingAllowed(false);
 			tables[i].setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			tables[i].setRowSorter(sorters[i]);
 
@@ -239,8 +241,8 @@ public class LibrarianFrame extends JFrame {
 
 	private void finishDialog() {
 		Object[] options = { "Save", "Don't Save", "Cancel" };
-		JOptionPane optionPane = new JOptionPane("Do you want to save your changes?", JOptionPane.QUESTION_MESSAGE,
-				JOptionPane.OK_CANCEL_OPTION, null, options);
+		JOptionPane optionPane = new JOptionPane("Do you want to save your changes?", 
+		JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options);
 		JDialog dialog = new JDialog(this, "Finish", true);
 		dialog.setContentPane(optionPane);
 		optionPane.addPropertyChangeListener(new PropertyChangeListener() {
@@ -329,6 +331,7 @@ public class LibrarianFrame extends JFrame {
 			while (rs.next()){
 				boolean isISBNDuplicate = false;
 				boolean isCopyNumDuplicate = false;
+
 				for (String value : isbn){
 					if (value.equals(rs.getString(1))){
 						isISBNDuplicate = true;
@@ -410,7 +413,6 @@ public class LibrarianFrame extends JFrame {
 						try {
 							String[] data = new String[columnNames[table].length];
 							CallableStatement cs = null;
-							Object[] rowData = null;
 
 							if (table == 0) {
 								for (int i = 0, j = 0; i < data.length; ++j){
@@ -418,7 +420,7 @@ public class LibrarianFrame extends JFrame {
 										data[i++] = ((JTextField) prompt[++j]).getText();
 									}
 									else if (i == 1){
-										data[i++] = new SimpleDateFormat("dd/MM/yyyy")
+										data[i++] = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
 										.format(((JSpinner)prompt[++j]).getValue());
 									}
 									else {
@@ -427,7 +429,7 @@ public class LibrarianFrame extends JFrame {
 									}
 								}
 
-								cs = con.prepareCall("{call add_transaction(?,to_date(?,'dd/MM/YYYY'),?,?,?,?)}");
+								cs = con.prepareCall("{call add_transaction(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
 
 							} else if (table == 1) {
 								for (int i = 0, j = 0; i < data.length; ++j) {
@@ -442,7 +444,7 @@ public class LibrarianFrame extends JFrame {
 										data[i++] = ((JTextField) prompt[++j]).getText();
 									}
 									else if (i == 5){
-										data[i++] = new SimpleDateFormat("dd/MM/yyyy")
+										data[i++] = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
 										.format(((JSpinner)prompt[++j]).getValue());
 									}
 									else {
@@ -451,7 +453,7 @@ public class LibrarianFrame extends JFrame {
 									}
 								}
 
-								cs = con.prepareCall("{call add_book(?,?,?,?,?,to_date(?,'dd/MM/YYYY'),?)}");
+								cs = con.prepareCall("{call add_book(?,?,?,?,?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?)}");
 
 							} else if (table == 3) {
 								for (int i = 0, j = 0; i < data.length; ++j) {
@@ -467,14 +469,12 @@ public class LibrarianFrame extends JFrame {
 								cs = con.prepareCall("{call add_librarian(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
 							}
 
-							rowData = new Object[data.length];
 							for (int i = 0; i < data.length; ++i) {
 								cs.setString(i + 1, data[i]);
-								rowData[i] = data[i];
 							}
 
 							cs.executeUpdate();
-							tableModels[table].addRow(rowData);
+							tableModels[table].addRow(data);
 							dialog.dispose();
 
 							JOptionPane.showMessageDialog(rootPane,panelTitles[table] + " Added!", 
@@ -500,20 +500,286 @@ public class LibrarianFrame extends JFrame {
 	private class EditListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for (int i = 0; i < editButtons.length; ++i){
-				if (editButtons[i].equals((JButton)e.getSource())){
-					int[] rows = tables[i].getSelectedRows();
-					if (rows.length == 0) return;
-					for (int j = 0; j < rows.length; ++j){
-						createEditDialog(i,j);
+			try {
+				for (int i = 0; i < editButtons.length; ++i){
+					if (editButtons[i].equals((JButton)e.getSource())){
+						int[] rows = tables[i].getSelectedRows();
+						if (rows.length == 0) return;
+						for (int j = 0; j < rows.length; ++j){
+							createEditDialog(i,rows[j]);
+						}
 					}
 				}
+			}
+			catch (SQLException | ParseException ex) {
+				JOptionPane.showMessageDialog(rootPane, ex.getMessage(),
+				"SQLException",JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
-	private void createEditDialog(int table, int row){
-		
+	private void createEditDialog(int table, int row) 
+		throws SQLException, ParseException {
+		Object[] prompt = new Object[columnNames[table].length * 2];
+
+		String[] values = new String[columnNames[table].length];
+
+		for (int i = 0; i < values.length; ++i){
+			values[i] = String.valueOf(tables[table].getValueAt(row,i));
+		}
+
+		Object[] field = null;
+
+		Calendar calendar = Calendar.getInstance();
+		Date initDate = calendar.getTime();
+		calendar.add(Calendar.YEAR, -100);
+		Date startDate = calendar.getTime();
+		calendar.add(Calendar.YEAR, 200);
+		Date endDate = calendar.getTime();
+		SpinnerModel dateModel = new SpinnerDateModel(initDate, startDate, endDate, Calendar.DAY_OF_MONTH);
+		JSpinner dateSpinner = new JSpinner(dateModel);
+		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy"));
+
+		Statement statement;
+		statement = con.createStatement();
+		ResultSet rs;
+
+		if (table == 0){
+
+			dateSpinner.setValue(new SimpleDateFormat("yyyy-MM-dd")
+			.parse(values[1].substring(0,10)));
+
+			JComboBox<String> modes = new JComboBox<String>(new String[]{ "LOAN", "RETURN", "RESERVE" });
+			modes.setSelectedItem(values[2]);
+
+			Vector<String>[] vectors = new Vector[3];
+			JComboBox<?>[] comboBoxes = new JComboBox[vectors.length];
+			
+			for (int i = 0; i < vectors.length; ++i){
+				vectors[i] = new Vector<String>();
+			}
+
+			rs = statement.executeQuery("SELECT LOGINID FROM PATRON");
+			while (rs.next()){
+				vectors[0].add(rs.getString(1));
+			}
+
+			rs = statement.executeQuery("SELECT ISBN, COPYNUMBER FROM BOOK");
+			while (rs.next()){
+				boolean isISBNDuplicate = false;
+				boolean isCopyNumDuplicate = false;
+
+				for (String isbn : vectors[1]){
+					if (isbn.equals(rs.getString(1))){
+						isISBNDuplicate = true;
+						break;
+					}
+				}
+
+				for (String cpnum : vectors[2]){
+					if (cpnum.equals(rs.getString(2))){
+						isCopyNumDuplicate = true;
+						break;
+					}
+				}
+
+				if (!isISBNDuplicate){
+					vectors[1].add(rs.getString(1));
+				}
+
+				if (!isCopyNumDuplicate){
+					vectors[2].add(rs.getString(2));
+				}
+			}
+
+			for (int i = 0; i < comboBoxes.length; ++i){
+				comboBoxes[i] = new JComboBox<String>(vectors[i]);
+				comboBoxes[i].setSelectedItem(values[3+i]);
+			}
+
+			field = new Object[] { 
+				new JTextField(values[0]), dateSpinner, modes,
+				comboBoxes[0], comboBoxes[1], comboBoxes[2] };
+
+		} else if (table == 1){
+
+			field = new Object[] { 
+				new JTextField(values[0]), new JTextField(values[1]),
+				new JTextField(values[2]), new JTextField(values[3]),
+				new JTextField(values[4]), new JTextField(values[5]),
+				new JTextField(values[6]), new JTextField(values[7]),
+				new JTextField(values[8]), new JTextField(values[9]) };
+
+		} else if (table == 2){
+
+			dateSpinner.setValue(new SimpleDateFormat("yyyy-MM-dd")
+			.parse(values[5].substring(0,10)));
+
+			rs = statement.executeQuery("SELECT SHELFID FROM SHELF");
+
+			Vector<String> shelfID = new Vector<String>();
+
+			while (rs.next()){
+				shelfID.add(rs.getString(1));
+			}
+
+			JComboBox<String> shelfBox = new JComboBox<String>(shelfID);
+			shelfBox.setSelectedItem(values[6]);
+
+			JComboBox<String> status = new JComboBox<String>(new String[]{ "ON-SHELF", "ON-HOLD", "ON-LOAN" });
+			status.setSelectedItem(values[4]);
+
+			field = new Object[] { 
+				new JTextField(values[0]), new JTextField(values[1]), 
+				new JTextField(values[2]), new JTextField(values[3]),
+				status, dateSpinner, shelfBox };
+
+		} else if (table == 3){
+
+			String[] access = { "111", "110", "100", "000", "001", "011", "010", "101" };
+
+			JComboBox<?>[] comboBoxes = new JComboBox[4];
+
+			for (int i = 0; i < comboBoxes.length; ++i){
+				comboBoxes[i] = new JComboBox<String>(access);
+				comboBoxes[i].setSelectedItem(values[10+i]);
+			}
+
+			field = new Object[] { 
+				new JTextField(values[0]), new JTextField(values[1]),
+				new JTextField(values[2]), new JTextField(values[3]),
+				new JTextField(values[4]), new JTextField(values[5]),
+				new JTextField(values[6]), new JTextField(values[7]),
+				new JTextField(values[8]), new JTextField(values[9]),
+				comboBoxes[0], comboBoxes[1], comboBoxes[2], comboBoxes[3] };
+		}
+
+		for (int i = 0, j = 0; i < prompt.length; ++j) {
+			prompt[i++] = columnNames[table][j];
+			prompt[i++] = field[j];
+		}
+
+		Object[] options = {"Save","Cancel"};
+
+		JOptionPane optionPane = new JOptionPane(prompt, JOptionPane.PLAIN_MESSAGE,
+		JOptionPane.OK_CANCEL_OPTION,null,options,options[0]);
+
+		JDialog dialog = new JDialog(this, editButtons[table].getText(), true);
+		dialog.setContentPane(optionPane);
+
+		optionPane.addPropertyChangeListener(new PropertyChangeListener(){
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (JOptionPane.VALUE_PROPERTY.equals(event.getPropertyName())) {
+					if (optionPane.getValue().equals(options[0])){
+						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+
+						try {
+							String[] data = new String[columnNames[table].length];
+							CallableStatement cs = null;
+
+							if (table == 0){
+								for (int i = 0, j = 0; i < data.length; ++j){
+									if (i == 0){
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else if (i == 1){
+										data[i++] = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+										.format(((JSpinner)prompt[++j]).getValue());
+									}
+									else {
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+								}
+
+								cs = con.prepareCall("{call edit_transaction(?,?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
+							}
+							else if (table == 1){
+								for (int i = 0, j = 0; i < data.length; ++j) {
+									data[i++] = ((JTextField) prompt[++j]).getText();
+								}
+
+								cs = con.prepareCall("{call edit_user(?,?,?,?,?,?,?,?,?,?,?)}");
+							}
+							else if (table == 2){
+								for (int i = 0, j = 0; i < data.length; ++j){
+									if (i < data.length - 3){
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else if (i == 5){
+										data[i++] = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+										.format(((JSpinner)prompt[++j]).getValue());
+									}
+									else {
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+								}
+
+								cs = con.prepareCall("{call edit_book(?,?,?,?,?,?,?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?)}");
+							}
+							else if (table == 3){
+								for (int i = 0, j = 0; i < data.length; ++j) {
+									if (i < data.length - 4) {
+										data[i++] = ((JTextField) prompt[++j]).getText();
+									}
+									else {
+										data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
+										.getSelectedItem());
+									}
+								}
+
+								cs = con.prepareCall("{call edit_librarian(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+							}
+
+							if (table != 2){
+								cs.setString(1, values[0]);
+								for (int i = 0; i < data.length; ++i){
+									cs.setString(i + 2, data[i]);
+								}
+							}
+							else {
+								cs.setString(1, values[0]);
+								cs.setString(2, values[1]);
+								for (int i =0; i < data.length; ++i){
+									cs.setString(i + 3, data[i]);
+								}
+							}
+
+							int response = JOptionPane.showConfirmDialog(rootPane, "Do you want save your changes to:\n" 
+							+ values[0], editButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+							if (response == JOptionPane.YES_OPTION){
+
+								cs.executeUpdate();
+
+								for (int i = 0; i < columnNames[table].length; ++i){
+									tables[table].setValueAt(data[i], row, i);
+								}
+
+								dialog.dispose();
+
+								JOptionPane.showMessageDialog(rootPane, panelTitles[table] + " Updated!", 
+								editButtons[table].getText(), JOptionPane.INFORMATION_MESSAGE);
+							}
+						}
+						catch (SQLException e) {
+							JOptionPane.showMessageDialog(rootPane, e.getMessage(),
+							"SQLException",JOptionPane.ERROR_MESSAGE);
+						}
+					}
+					else if (optionPane.getValue().equals(options[1])){
+						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+						dialog.dispose();
+					}
+				}
+			}
+		});
+
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
 	}
 
 	private class DeleteListener implements ActionListener {
@@ -563,7 +829,7 @@ public class LibrarianFrame extends JFrame {
 
 						CallableStatement cs = null;
 						if (table == 0){
-							cs = con.prepareCall("{call delete_transcation(?)}");
+							cs = con.prepareCall("{call delete_transaction(?)}");
 							cs.setString(1,keys.get(0)[i]);
 						}
 						else if (table == 1){
@@ -586,6 +852,9 @@ public class LibrarianFrame extends JFrame {
 					}
 				}
 			}
+
+			JOptionPane.showMessageDialog(rootPane, panelTitles[table] + " Deleted!",
+			deleteButtons[table].getText(), JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 
