@@ -67,13 +67,17 @@ public class PatronFrame extends JFrame {
         searchBoxes = new JComboBox[tables.length];
 
         initComponents();
-        
-        
     }
     
     public void initComponents() {
-        
         tablesTabbedPane = new JTabbedPane();
+        
+        try {
+            data = getData(con);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
         
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
@@ -168,6 +172,30 @@ public class PatronFrame extends JFrame {
         login.setLocationRelativeTo(null);
         login.setVisible(true);
         dispose();
+    }
+    
+    private Object[][][] getData(Connection con) throws SQLException {
+        Object[][][] data = new Object[panels.length][][];
+
+        for (int i = 0; i < data.length; ++i){
+            Statement statement;
+            statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs;
+
+            rs = statement.executeQuery("SELECT * FROM " + tableNames[i]);
+            rs.last();
+            data[i] = new Object[rs.getRow()][];
+            rs.beforeFirst();
+
+            for (int j = 0; rs.next(); ++j){
+                data[i][j] = new Object[columnNames[i].length];
+                for (int k = 0; k < data[i][j].length; ++k){
+                    data[i][j][k] = rs.getString(k+1);
+                }
+            }
+        }
+
+        return data;
     }
     
     private class SearchListener extends KeyAdapter implements DocumentListener, ItemListener {

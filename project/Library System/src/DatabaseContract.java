@@ -1,7 +1,7 @@
 public final class DatabaseContract {
     public final static String TRANSACTION_TABLE = "Transaction";
     public final static String PATRON_TABLE = "Patron";
-    public final static String BOOK_TABLE = "Books";
+    public final static String BOOK_TABLE = "Book";
     public final static String LIBRARIAN_TABLE = "Librarian";
     public final static int TOTAL_TABLE_NUMBER_SIZE = 4;
 
