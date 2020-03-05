@@ -922,6 +922,15 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             }
         }
 
+        for (int i = 0; i < keys.size(); ++i){
+            if (keys.get(i)[0].equals(loginId)){
+                JOptionPane.showMessageDialog(rootPane, 
+                "Invalid Action", "Delete Librarian", 
+                JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
         int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to delete selected " 
         + tableNames[table] + "/s", deleteButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
