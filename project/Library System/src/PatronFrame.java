@@ -29,9 +29,11 @@ public class PatronFrame extends JFrame {
     private JComboBox<?>[] searchBoxes;
     private DefaultTableModel[] tableModels;
     private TableRowSorter<DefaultTableModel>[] sorters;
+    private String loginId;
     
     public PatronFrame(Connection con, String loginId){
         this.con = con;
+        this.loginId = loginId;
         setTitle("Patron");
         
         tableNames = new String[] {DatabaseContract.TRANSACTION_TABLE,
@@ -192,7 +194,15 @@ public class PatronFrame extends JFrame {
             statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             ResultSet rs;
 
-            rs = statement.executeQuery("SELECT * FROM " + tableNames[i]);
+            if(i == 0) {
+                rs = statement.executeQuery("SELECT * FROM " + tableNames[i] +
+                                            " WHERE PATRON_LOGINID = " + loginId);
+            }
+            
+            else {
+                rs = statement.executeQuery("SELECT * FROM " + tableNames[i]);
+            }
+            
             rs.last();
             data[i] = new Object[rs.getRow()][];
             rs.beforeFirst();

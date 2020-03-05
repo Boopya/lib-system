@@ -11,14 +11,12 @@ public class LoginFrame extends JFrame implements SQLStatements{
     private Menu aboutMenu;
     private MenuItem aboutSystemMenuItem;
     private MenuItem aboutUsMenuItem;
-
     private JLabel loginLabel;
     private JLabel passwordLabel;
     private JTextField loginField;
     private JPasswordField passwordField;
     private JButton loginButton;
-
-    private String userId;
+    private String loginId;
 
     public LoginFrame(Connection con){
             this.con = con;
@@ -137,6 +135,7 @@ public class LoginFrame extends JFrame implements SQLStatements{
 
         loginId = loginField.getText();
         password = String.valueOf(passwordField.getPassword());
+        this.loginId = loginId;
 
         if (loginId.isEmpty() || password.isEmpty()){
             JOptionPane.showMessageDialog(rootPane, "You must fill all the required fields.", "Null Input", JOptionPane.WARNING_MESSAGE);
@@ -156,8 +155,6 @@ public class LoginFrame extends JFrame implements SQLStatements{
                     return;
             }
 
-            userId = loginId;
-
             preparedStatement = con.prepareStatement(LIBRARIAN_QUERY);
             preparedStatement.setString(1, loginId);
             resultSet = preparedStatement.executeQuery();
@@ -167,7 +164,7 @@ public class LoginFrame extends JFrame implements SQLStatements{
             if(isLibrarian)
                     showSelectModeInterface();
             else
-                    showPatronFrame(userId);
+                    showPatronFrame();
 
             preparedStatement.close();
             resultSet.close();
@@ -203,11 +200,11 @@ public class LoginFrame extends JFrame implements SQLStatements{
                 if (JOptionPane.VALUE_PROPERTY.equals(event.getPropertyName())){
                     if (selectModeInterfacePane.getValue().equals(modeInterfaceOptions[AS_LIBRARIAN])){
                         selectModeInterfacePane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-                        showLibrarianFrame(userId);
+                        showLibrarianFrame();
                     }
                     else if (selectModeInterfacePane.getValue().equals(modeInterfaceOptions[AS_PATRON])){
                         selectModeInterfacePane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-                        showPatronFrame(userId);
+                        showPatronFrame();
                     }
                 }
             }
@@ -218,8 +215,8 @@ public class LoginFrame extends JFrame implements SQLStatements{
         dialog.setVisible(true);
     }
 
-    private void showPatronFrame(String loginId){
-        PatronFrame patron = new PatronFrame(con,loginId);
+    private void showPatronFrame(){
+        PatronFrame patron = new PatronFrame(con, loginId);
         patron.setSize(900,600);
         patron.setResizable(false);
         patron.setLocationRelativeTo(null);
@@ -227,7 +224,7 @@ public class LoginFrame extends JFrame implements SQLStatements{
         dispose();
     }
 
-    private void showLibrarianFrame(String loginId){
+    private void showLibrarianFrame(){
         LibrarianFrame librarian = new LibrarianFrame(con,loginId);
         librarian.setSize(900,600);
         librarian.setResizable(false);
