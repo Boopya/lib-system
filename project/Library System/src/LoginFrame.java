@@ -11,12 +11,12 @@ public class LoginFrame extends JFrame implements SQLStatements{
     private Menu aboutMenu;
     private MenuItem aboutSystemMenuItem;
     private MenuItem aboutUsMenuItem;
-
     private JLabel loginLabel;
     private JLabel passwordLabel;
     private JTextField loginField;
     private JPasswordField passwordField;
     private JButton loginButton;
+    private String loginId;
 
     public LoginFrame(Connection con){
             this.con = con;
@@ -135,6 +135,7 @@ public class LoginFrame extends JFrame implements SQLStatements{
 
         loginId = loginField.getText();
         password = String.valueOf(passwordField.getPassword());
+        this.loginId = loginId;
 
         if (loginId.isEmpty() || password.isEmpty()){
             JOptionPane.showMessageDialog(rootPane, "You must fill all the required fields.", "Null Input", JOptionPane.WARNING_MESSAGE);
@@ -215,7 +216,7 @@ public class LoginFrame extends JFrame implements SQLStatements{
     }
 
     private void showPatronFrame(){
-        PatronFrame patron = new PatronFrame(con);
+        PatronFrame patron = new PatronFrame(con, loginId);
         patron.setSize(900,600);
         patron.setResizable(false);
         patron.setLocationRelativeTo(null);
