@@ -510,7 +510,12 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                                     }
                                 }
 
-                                cs = con.prepareCall("{call add_transaction(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
+                                if (data[2].equals("LOAN")){
+                                    cs = con.prepareCall("{call loan_book(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
+                                }
+                                else if (data[2].equals("RETURN")){
+                                    cs = con.prepareCall("{call return_book(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
+                                }
                             }
                             
                             else if (table == 1) {
@@ -559,7 +564,22 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                             }
 
                             cs.executeUpdate();
-                            tableModels[table].addRow(data);
+
+                            if (table != 0){
+                                tableModels[table].addRow(data);
+                            }
+                            else {
+                                try {
+                                    Object[][][] dataModels = getData(con);
+                                    for (int i = 0; i < tableModels.length; ++i){
+                                        tableModels[i].setDataVector(dataModels[i],columnNames[i]);
+                                        tableModels[i].fireTableDataChanged();
+                                    }
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            
                             dialog.dispose();
 
                             JOptionPane.showMessageDialog(rootPane,tableNames[table] + " Added!", 
