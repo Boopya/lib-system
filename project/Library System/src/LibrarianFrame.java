@@ -662,15 +662,21 @@ public class LibrarianFrame extends JFrame  {
                 comboBoxes[i].setSelectedItem(values[3+i]);
             }
 
+            JTextField transIdField = new JTextField(values[0]);
+            transIdField.setEditable(false);
+
             field = new Object[] { 
-                new JTextField(values[0]), dateSpinner, modes,
+                transIdField, dateSpinner, modes,
                 comboBoxes[0], comboBoxes[1], comboBoxes[2] };
 
         }
         
         else if(table == 1) {
+            JTextField loginIdField = new JTextField(values[0]);
+            loginIdField.setEditable(false);
+
             field = new Object[] { 
-                    new JTextField(values[0]), new JTextField(values[1]),
+                    loginIdField, new JTextField(values[1]),
                     new JTextField(values[2]), new JTextField(values[3]),
                     new JTextField(values[4]), new JTextField(values[5]),
                     new JTextField(values[6]), new JTextField(values[7]),
@@ -695,8 +701,13 @@ public class LibrarianFrame extends JFrame  {
             JComboBox<String> status = new JComboBox<String>(new String[]{ "ON-SHELF", "ON-HOLD", "ON-LOAN" });
             status.setSelectedItem(values[4]);
 
+            JTextField isbnField = new JTextField(values[0]);
+            JTextField cpNumField = new JTextField(values[1]);
+            isbnField.setEditable(false);
+            cpNumField.setEditable(false);
+
             field = new Object[] { 
-                    new JTextField(values[0]), new JTextField(values[1]), 
+                    isbnField, cpNumField, 
                     new JTextField(values[2]), new JTextField(values[3]),
                     status, dateSpinner, shelfBox };
         }
@@ -711,8 +722,11 @@ public class LibrarianFrame extends JFrame  {
                 comboBoxes[i].setSelectedItem(values[10+i]);
             }
 
+            JTextField loginIdField = new JTextField(values[0]);
+            loginIdField.setEditable(false);
+
             field = new Object[] { 
-                    new JTextField(values[0]), new JTextField(values[1]),
+                    loginIdField, new JTextField(values[1]),
                     new JTextField(values[2]), new JTextField(values[3]),
                     new JTextField(values[4]), new JTextField(values[5]),
                     new JTextField(values[6]), new JTextField(values[7]),
