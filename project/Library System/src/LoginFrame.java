@@ -18,6 +18,8 @@ public class LoginFrame extends JFrame implements SQLStatements{
     private JPasswordField passwordField;
     private JButton loginButton;
 
+    private String userId;
+
     public LoginFrame(Connection con){
             this.con = con;
             initComponents();
@@ -154,6 +156,8 @@ public class LoginFrame extends JFrame implements SQLStatements{
                     return;
             }
 
+            userId = loginId;
+
             preparedStatement = con.prepareStatement(LIBRARIAN_QUERY);
             preparedStatement.setString(1, loginId);
             resultSet = preparedStatement.executeQuery();
@@ -163,7 +167,7 @@ public class LoginFrame extends JFrame implements SQLStatements{
             if(isLibrarian)
                     showSelectModeInterface();
             else
-                    showPatronFrame();
+                    showPatronFrame(userId);
 
             preparedStatement.close();
             resultSet.close();
@@ -199,11 +203,11 @@ public class LoginFrame extends JFrame implements SQLStatements{
                 if (JOptionPane.VALUE_PROPERTY.equals(event.getPropertyName())){
                     if (selectModeInterfacePane.getValue().equals(modeInterfaceOptions[AS_LIBRARIAN])){
                         selectModeInterfacePane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-                        showLibrarianFrame();
+                        showLibrarianFrame(userId);
                     }
                     else if (selectModeInterfacePane.getValue().equals(modeInterfaceOptions[AS_PATRON])){
                         selectModeInterfacePane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-                        showPatronFrame();
+                        showPatronFrame(userId);
                     }
                 }
             }
@@ -214,8 +218,8 @@ public class LoginFrame extends JFrame implements SQLStatements{
         dialog.setVisible(true);
     }
 
-    private void showPatronFrame(){
-        PatronFrame patron = new PatronFrame(con);
+    private void showPatronFrame(String loginId){
+        PatronFrame patron = new PatronFrame(con,loginId);
         patron.setSize(900,600);
         patron.setResizable(false);
         patron.setLocationRelativeTo(null);
@@ -223,8 +227,8 @@ public class LoginFrame extends JFrame implements SQLStatements{
         dispose();
     }
 
-    private void showLibrarianFrame(){
-        LibrarianFrame librarian = new LibrarianFrame(con);
+    private void showLibrarianFrame(String loginId){
+        LibrarianFrame librarian = new LibrarianFrame(con,loginId);
         librarian.setSize(900,600);
         librarian.setResizable(false);
         librarian.setLocationRelativeTo(null);

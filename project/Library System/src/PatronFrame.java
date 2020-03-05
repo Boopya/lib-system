@@ -30,7 +30,7 @@ public class PatronFrame extends JFrame {
     private DefaultTableModel[] tableModels;
     private TableRowSorter<DefaultTableModel>[] sorters;
     
-    public PatronFrame(Connection con){
+    public PatronFrame(Connection con, String loginId){
         this.con = con;
         setTitle("Patron");
         

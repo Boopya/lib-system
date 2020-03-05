@@ -36,8 +36,11 @@ public class LibrarianFrame extends JFrame  {
     private DefaultTableModel[] tableModels;
     private TableRowSorter<DefaultTableModel>[] sorters;
 
-    public LibrarianFrame(Connection con) {
+    private String loginId;
+
+    public LibrarianFrame(Connection con, String loginId) {
             this.con = con;
+            this.loginId = loginId;
             setTitle("Librarian");
 
             tableNames = 
@@ -222,6 +225,24 @@ public class LibrarianFrame extends JFrame  {
             constraints.anchor = GridBagConstraints.EAST;
             constraints.gridwidth = 1;
             panels[i].add(finishButtons[i], constraints);
+        }
+
+        String[] access = new String[tables.length];
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement("SELECT TRANSACCESS, PATRONACCESS, BOOKACCESS, LIBACCESS FROM LIBRARIAN WHERE LOGINID = ?");
+            preparedStatement.setString(1,loginId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+                for (int i = 0; i < access.length; ++i){
+                    access[i] = resultSet.getString(i+1);
+                    if (access[i].charAt(0) == '0') addButtons[i].setEnabled(false);
+                    if (access[i].charAt(1) == '0') editButtons[i].setEnabled(false);
+                    if (access[i].charAt(2) == '0') deleteButtons[i].setEnabled(false);
+                }
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         tablesTabbedPane.setFocusable(false);
