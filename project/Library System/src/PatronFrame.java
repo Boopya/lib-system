@@ -22,6 +22,7 @@ public class PatronFrame extends JFrame {
     private String[] tableNames;
     private String[][] columnNames;
     private Object[][][] data;
+    private JButton reserveButton;
     private JPanel[] searchPanels;
     private JLabel[] searchLabels;
     private JTextField[] searchFields;
@@ -145,6 +146,15 @@ public class PatronFrame extends JFrame {
             constraints.gridwidth = 4;
             panels[i].add(new JScrollPane(tables[i], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), constraints);
+            
+            if(i == 1) { // if books panel
+                reserveButton = new JButton("Reserve Book");
+                reserveButton.addActionListener(new ReserveButtonListener());
+                constraints.gridx = 0;
+                constraints.gridy = 2;
+                constraints.anchor = GridBagConstraints.CENTER;
+                panels[i].add(reserveButton, constraints);
+            }
         }
         
         tablesTabbedPane.setFocusable(false);
@@ -196,6 +206,13 @@ public class PatronFrame extends JFrame {
         }
 
         return data;
+    }
+    
+    private class ReserveButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            // TODO
+        }
     }
     
     private class SearchListener extends KeyAdapter implements DocumentListener, ItemListener {
