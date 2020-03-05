@@ -22,6 +22,7 @@ public class PatronFrame extends JFrame {
     private String[] tableNames;
     private String[][] columnNames;
     private Object[][][] data;
+    private JButton reserveButton;
     private JPanel[] searchPanels;
     private JLabel[] searchLabels;
     private JTextField[] searchFields;
@@ -67,13 +68,17 @@ public class PatronFrame extends JFrame {
         searchBoxes = new JComboBox[tables.length];
 
         initComponents();
-        
-        
     }
     
     public void initComponents() {
-        
         tablesTabbedPane = new JTabbedPane();
+        
+        try {
+            data = getData(con);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
         
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
@@ -141,6 +146,15 @@ public class PatronFrame extends JFrame {
             constraints.gridwidth = 4;
             panels[i].add(new JScrollPane(tables[i], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), constraints);
+            
+            if(i == 1) { // if books panel
+                reserveButton = new JButton("Reserve Book");
+                reserveButton.addActionListener(new ReserveButtonListener());
+                constraints.gridx = 0;
+                constraints.gridy = 2;
+                constraints.anchor = GridBagConstraints.CENTER;
+                panels[i].add(reserveButton, constraints);
+            }
         }
         
         tablesTabbedPane.setFocusable(false);
@@ -168,6 +182,37 @@ public class PatronFrame extends JFrame {
         login.setLocationRelativeTo(null);
         login.setVisible(true);
         dispose();
+    }
+    
+    private Object[][][] getData(Connection con) throws SQLException {
+        Object[][][] data = new Object[panels.length][][];
+
+        for (int i = 0; i < data.length; ++i){
+            Statement statement;
+            statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs;
+
+            rs = statement.executeQuery("SELECT * FROM " + tableNames[i]);
+            rs.last();
+            data[i] = new Object[rs.getRow()][];
+            rs.beforeFirst();
+
+            for (int j = 0; rs.next(); ++j){
+                data[i][j] = new Object[columnNames[i].length];
+                for (int k = 0; k < data[i][j].length; ++k){
+                    data[i][j][k] = rs.getString(k+1);
+                }
+            }
+        }
+
+        return data;
+    }
+    
+    private class ReserveButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            // TODO
+        }
     }
     
     private class SearchListener extends KeyAdapter implements DocumentListener, ItemListener {
