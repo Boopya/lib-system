@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
-public class LibrarianFrame extends JFrame  {
+public class LibrarianFrame extends JFrame implements SQLStatements {
     private static final long serialVersionUID = 1L;
     private Connection con;
     private JTabbedPane tablesTabbedPane;
@@ -229,7 +229,7 @@ public class LibrarianFrame extends JFrame  {
 
         String[] access = new String[tables.length];
         try {
-            PreparedStatement preparedStatement = con.prepareStatement("SELECT TRANSACCESS, PATRONACCESS, BOOKACCESS, LIBACCESS FROM LIBRARIAN WHERE LOGINID = ?");
+            PreparedStatement preparedStatement = con.prepareStatement(ACCESS_QUERY);
             preparedStatement.setString(1,loginId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()){
