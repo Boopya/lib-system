@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
-public class LibrarianFrame extends JFrame  {
+public class LibrarianFrame extends JFrame implements SQLStatements {
     private static final long serialVersionUID = 1L;
     private Connection con;
     private JTabbedPane tablesTabbedPane;
@@ -36,8 +36,11 @@ public class LibrarianFrame extends JFrame  {
     private DefaultTableModel[] tableModels;
     private TableRowSorter<DefaultTableModel>[] sorters;
 
-    public LibrarianFrame(Connection con) {
+    private String loginId;
+
+    public LibrarianFrame(Connection con, String loginId) {
             this.con = con;
+            this.loginId = loginId;
             setTitle("Librarian");
 
             tableNames = 
@@ -222,6 +225,24 @@ public class LibrarianFrame extends JFrame  {
             constraints.anchor = GridBagConstraints.EAST;
             constraints.gridwidth = 1;
             panels[i].add(finishButtons[i], constraints);
+        }
+
+        String[] access = new String[tables.length];
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(ACCESS_QUERY);
+            preparedStatement.setString(1,loginId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+                for (int i = 0; i < access.length; ++i){
+                    access[i] = resultSet.getString(i+1);
+                    if (access[i].charAt(0) == '0') addButtons[i].setEnabled(false);
+                    if (access[i].charAt(1) == '0') editButtons[i].setEnabled(false);
+                    if (access[i].charAt(2) == '0') deleteButtons[i].setEnabled(false);
+                }
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         tablesTabbedPane.setFocusable(false);
@@ -489,7 +510,12 @@ public class LibrarianFrame extends JFrame  {
                                     }
                                 }
 
-                                cs = con.prepareCall("{call add_transaction(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
+                                if (data[2].equals("LOAN")){
+                                    cs = con.prepareCall("{call loan_book(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
+                                }
+                                else if (data[2].equals("RETURN")){
+                                    cs = con.prepareCall("{call return_book(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
+                                }
                             }
                             
                             else if (table == 1) {
@@ -538,7 +564,22 @@ public class LibrarianFrame extends JFrame  {
                             }
 
                             cs.executeUpdate();
-                            tableModels[table].addRow(data);
+
+                            if (table != 0){
+                                tableModels[table].addRow(data);
+                            }
+                            else {
+                                try {
+                                    Object[][][] dataModels = getData(con);
+                                    for (int i = 0; i < tableModels.length; ++i){
+                                        tableModels[i].setDataVector(dataModels[i],columnNames[i]);
+                                        tableModels[i].fireTableDataChanged();
+                                    }
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            
                             dialog.dispose();
 
                             JOptionPane.showMessageDialog(rootPane,tableNames[table] + " Added!", 
@@ -662,15 +703,21 @@ public class LibrarianFrame extends JFrame  {
                 comboBoxes[i].setSelectedItem(values[3+i]);
             }
 
+            JTextField transIdField = new JTextField(values[0]);
+            transIdField.setEditable(false);
+
             field = new Object[] { 
-                new JTextField(values[0]), dateSpinner, modes,
+                transIdField, dateSpinner, modes,
                 comboBoxes[0], comboBoxes[1], comboBoxes[2] };
 
         }
         
         else if(table == 1) {
+            JTextField loginIdField = new JTextField(values[0]);
+            loginIdField.setEditable(false);
+
             field = new Object[] { 
-                    new JTextField(values[0]), new JTextField(values[1]),
+                    loginIdField, new JTextField(values[1]),
                     new JTextField(values[2]), new JTextField(values[3]),
                     new JTextField(values[4]), new JTextField(values[5]),
                     new JTextField(values[6]), new JTextField(values[7]),
@@ -695,8 +742,13 @@ public class LibrarianFrame extends JFrame  {
             JComboBox<String> status = new JComboBox<String>(new String[]{ "ON-SHELF", "ON-HOLD", "ON-LOAN" });
             status.setSelectedItem(values[4]);
 
+            JTextField isbnField = new JTextField(values[0]);
+            JTextField cpNumField = new JTextField(values[1]);
+            isbnField.setEditable(false);
+            cpNumField.setEditable(false);
+
             field = new Object[] { 
-                    new JTextField(values[0]), new JTextField(values[1]), 
+                    isbnField, cpNumField, 
                     new JTextField(values[2]), new JTextField(values[3]),
                     status, dateSpinner, shelfBox };
         }
@@ -711,8 +763,11 @@ public class LibrarianFrame extends JFrame  {
                 comboBoxes[i].setSelectedItem(values[10+i]);
             }
 
+            JTextField loginIdField = new JTextField(values[0]);
+            loginIdField.setEditable(false);
+
             field = new Object[] { 
-                    new JTextField(values[0]), new JTextField(values[1]),
+                    loginIdField, new JTextField(values[1]),
                     new JTextField(values[2]), new JTextField(values[3]),
                     new JTextField(values[4]), new JTextField(values[5]),
                     new JTextField(values[6]), new JTextField(values[7]),
@@ -884,6 +939,15 @@ public class LibrarianFrame extends JFrame  {
             keys.add(new String[rows.length]);
             for (int i = 0; i < rows.length; ++i){
                 keys.get(1)[i] = String.valueOf(tables[table].getValueAt(rows[i],1));
+            }
+        }
+
+        for (int i = 0; i < keys.size(); ++i){
+            if (keys.get(i)[0].equals(loginId)){
+                JOptionPane.showMessageDialog(rootPane, 
+                "Invalid Action", "Delete Librarian", 
+                JOptionPane.ERROR_MESSAGE);
+                return;
             }
         }
 

@@ -225,7 +225,7 @@ public class LoginFrame extends JFrame implements SQLStatements{
     }
 
     private void showLibrarianFrame(){
-        LibrarianFrame librarian = new LibrarianFrame(con);
+        LibrarianFrame librarian = new LibrarianFrame(con,loginId);
         librarian.setSize(900,600);
         librarian.setResizable(false);
         librarian.setLocationRelativeTo(null);

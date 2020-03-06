@@ -284,6 +284,7 @@ END update_book_status;
 CREATE OR REPLACE PROCEDURE loan_book (
     p_transid transaction.transactionid%type,
     p_transdate transaction.transactiondate%type,
+    p_transmode transaction.transactionmode%type,
     p_loginid transaction.patron_loginid%type,
     p_isbn transaction.book_isbn%type,
     p_cpnum transaction.book_copynumber%type ) IS
@@ -303,6 +304,7 @@ END loan_book;
 CREATE OR REPLACE PROCEDURE return_book (
     p_transid transaction.transactionid%type,
     p_transdate transaction.transactiondate%type,
+    p_transmode transaction.transactionmode%type,
     p_loginid transaction.patron_loginid%type,
     p_isbn transaction.book_isbn%type,
     p_cpnum transaction.book_copynumber%type ) IS

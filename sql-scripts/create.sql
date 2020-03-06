@@ -93,9 +93,9 @@ CREATE TABLE transaction (
     transactionid     NUMBER(30) NOT NULL,
     transactiondate   DATE NOT NULL,
     transactionmode   VARCHAR2(20) NOT NULL,
-    patron_loginid    NUMBER(25) NOT NULL,
-    book_isbn         NUMBER(13) NOT NULL,
-    book_copynumber   NUMBER(3) NOT NULL
+    patron_loginid    NUMBER(25),
+    book_isbn         NUMBER(13),
+    book_copynumber   NUMBER(3)
 );
 
 ALTER TABLE transaction
@@ -104,12 +104,11 @@ ALTER TABLE transaction
 ALTER TABLE transaction
     ADD CONSTRAINT transaction_book_fk FOREIGN KEY ( book_isbn,
                                                      book_copynumber )
-        REFERENCES book ( isbn,
-                          copynumber );
+        REFERENCES book ( isbn, copynumber ) ON DELETE SET NULL;
 
 ALTER TABLE transaction
     ADD CONSTRAINT transaction_patron_fk FOREIGN KEY ( patron_loginid )
-        REFERENCES patron ( loginid );
+        REFERENCES patron ( loginid ) ON DELETE SET NULL;
         
 ALTER TABLE transaction ADD CONSTRAINT transactionmode_check CHECK (
     transactionmode IN ( 'LOAN','RETURN','RESERVE' ));
