@@ -275,4 +275,24 @@ BEGIN
 END update_user_fine;
 /
 
+
+CREATE OR REPLACE TRIGGER shelf_capacity_trigger
+BEFORE INSERT ON book FOR EACH ROW
+DECLARE
+v_books shelf.capacity%TYPE := 0;
+v_capacity shelf.capacity%TYPE := 0;
+BEGIN
+    SELECT COUNT(isbn) INTO v_books FROM book 
+    WHERE shelf_shelfid = :NEW.shelf_shelfid;
+
+    SELECT capacity INTO v_capacity FROM shelf
+    WHERE shelfid = :NEW.shelf_shelfid;
+
+    IF (v_books >= v_capacity) THEN
+        RAISE_APPLICATION_ERROR(-20100,'The shelf is at the maximum capacity.');
+    END IF;
+
+END shelf_capacity_trigger;
+/
+
 COMMIT;
