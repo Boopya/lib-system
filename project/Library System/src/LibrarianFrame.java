@@ -386,13 +386,22 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
         JSpinner dateSpinner = initializeDateSpinner();
 
+        String userID = null;
+        String transactionID = null;
+        Statement statement = con.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT PATRON_ID_SEQ.NEXTVAL, TRANSACTION_ID_SEQ.NEXTVAL FROM PATRON");
+        if (resultSet.next()){
+            userID = resultSet.getString(1);
+            transactionID = resultSet.getString(2);
+        }
+
         switch (table) {
             case 0:
                 Vector<String> loginID = singleDistinctQuery(TABLES[1], PATRON_COLUMNS[0]);
                 Vector<String> isbn = singleDistinctQuery(TABLES[2], BOOK_COLUMNS[0]);
                 Vector<String> copyNumber = singleDistinctQuery(TABLES[2], BOOK_COLUMNS[1]);
 
-                field = new Object[] { new JTextField(), dateSpinner,
+                field = new Object[] { new JTextField(transactionID), dateSpinner,
                     new JComboBox<String>(TRANSACTION_MODE), new JComboBox<String>(loginID), 
                     new JComboBox<String>(isbn), new JComboBox<String>(copyNumber) };
 
@@ -400,7 +409,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
             case 1:
 
-                field = new Object[] { new JTextField(), new JTextField(), new JTextField(), 
+                field = new Object[] { new JTextField(userID), new JTextField(), new JTextField(), 
                     new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
                     new JTextField(), new JTextField(), new JTextField() };
 
@@ -418,7 +427,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             case 3:
 
                 field = new Object[] { 
-                    new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
+                    new JTextField(transactionID), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
                     new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
                     new JComboBox<String>(ACCESS_PERMISSIONS), new JComboBox<String>(ACCESS_PERMISSIONS),
                     new JComboBox<String>(ACCESS_PERMISSIONS), new JComboBox<String>(ACCESS_PERMISSIONS) };
@@ -557,19 +566,33 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
     }
 
     private void transactionValidation(String[] data) throws SQLException {
-        String currentStatus = null;
-        String statusDate = null;
-        String loginID = null;
-        int loanCount = 0;
-        int returnCount = 0;
-        int reserveCount = 0;
-        int pendingCount = 0;
-        int statusInterval = 0;
-        int penaltyFee = 0;
-
         if (data[0].isEmpty()){
             throw new SQLException("Transaction ID must not be null.");
         }
+
+        switch (data[2]) {
+            case "LOAN":
+                loanValidation(con, data);
+                break;
+
+            case "RETURN":
+                returnValidation(con, data);
+                break;
+
+            case "RESERVE":
+                reserveValidation(con, data);
+                break;
+        
+            default:
+                JOptionPane.showMessageDialog(rootPane, "Unexpected Behavior", 
+                "Error!", JOptionPane.ERROR_MESSAGE);
+                break;
+        }
+    }
+
+    public static void loanValidation(Connection con, String[] data) throws SQLException {
+        String currentStatus = null;
+        String statusDate = null;
 
         PreparedStatement ps = con.prepareStatement(BOOK_STATUS_QUERY);
         ps.setString(1,data[4]);
@@ -583,102 +606,116 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             throw new SQLException("Book does not exist.");
         }
 
-        switch (data[2]) {
+        String loginID = getPatronModeQuery(con,data,"RESERVE",statusDate);
 
-            case "LOAN":
+        int loanCount = getModeCountQuery(con,data,"LOAN");
+        int returnCount = getModeCountQuery(con,data,"RETURN");
+        int reserveCount = getModeCountQuery(con,data,"RESERVE");
 
-                loginID = getPatronModeQuery(data,"RESERVE",statusDate);
+        reserveCount = (reserveCount - returnCount < 0) ? 0 : reserveCount - returnCount;
 
-                loanCount = getModeCountQuery(data,"LOAN");
-                returnCount = getModeCountQuery(data,"RETURN");
-                reserveCount = getModeCountQuery(data,"RESERVE");
+        int pendingCount = loanCount - returnCount + reserveCount;
 
-                reserveCount = (reserveCount - returnCount < 0) ? 0 : reserveCount - returnCount;
+        int statusInterval = getDayInterval(statusDate, data[1]);
 
-                pendingCount = loanCount - returnCount + reserveCount;
-
-                statusInterval = getDayInterval(statusDate, data[1]);
-
-                if (currentStatus.equals("ON-LOAN")){
-                    throw new SQLException("The book is already loaned.");
-                }
-                else if (currentStatus.equals("ON-HOLD") && loginID != null && !loginID.equals(data[3]) && statusInterval <= 7){
-                    throw new SQLException("The book is reserved for another patron.");
-                }
-                else if (pendingCount >= 2){
-                    throw new SQLException("You have reached maximum reserved/loaned books.");
-                }
-
-                updateBookStatus(data,"ON-LOAN");
-
-                break;
-
-            case "RETURN":
-
-                loginID = getPatronModeQuery(data, "LOAN",statusDate);
-
-                if (!currentStatus.equals("ON-LOAN")){
-                    throw new SQLException("The book is already returned.");
-                }
-                else if (loginID != null && !loginID.equals(data[3])){
-                    throw new SQLException("You cannot return a book that has been loaned by another patron.");
-                }
-
-                statusInterval = getDayInterval(statusDate, data[1]);
-
-                if (statusInterval > 7){
-                    statusInterval -= 7;
-                    penaltyFee = statusInterval * 20;
-                    CallableStatement cs = con.prepareCall("{call update_user_fine(?,?)}");
-                    cs.setString(1,data[3]);
-                    cs.setInt(2,penaltyFee);
-                    cs.executeUpdate();
-                }
-
-                updateBookStatus(data,"ON-SHELF");
-                
-                break;
-
-            case "RESERVE":
-
-                loginID = getPatronModeQuery(data,"RESERVE",statusDate);
-                
-                loanCount = getModeCountQuery(data,"LOAN");
-                returnCount = getModeCountQuery(data,"RETURN");
-                reserveCount = getModeCountQuery(data,"RESERVE");
-
-                statusInterval = getDayInterval(statusDate, data[1]);
-
-                reserveCount = (reserveCount - returnCount < 0) ? 0 : reserveCount - returnCount;
-
-                pendingCount = loanCount - returnCount + reserveCount;
-
-                if (currentStatus.equals("ON-HOLD") && loginID != null && loginID.equals(data[3])){
-                    throw new SQLException("You already reserve the book.");
-                }
-
-                if (currentStatus.equals("ON-LOAN")){
-                    throw new SQLException("The book is not available for reserve.");
-                }
-                else if (currentStatus.equals("ON-HOLD") && loginID != null && !loginID.equals(data[3]) && statusInterval <= 7){
-                    throw new SQLException("The book is reserved for another patron.");
-                }
-                else if (pendingCount >= 2){
-                    throw new SQLException("You have reached maximum reserved/loaned books.");
-                }
-
-                updateBookStatus(data,"ON-HOLD");
-                
-                break;
-        
-            default:
-                JOptionPane.showMessageDialog(rootPane, "Unexpected Behavior", 
-                "Error!", JOptionPane.ERROR_MESSAGE);
-                break;
+        if (currentStatus.equals("ON-LOAN")){
+            throw new SQLException("The book is already loaned.");
         }
+        else if (currentStatus.equals("ON-HOLD") && loginID != null && !loginID.equals(data[3]) && statusInterval <= 7){
+            throw new SQLException("The book is reserved for another patron.");
+        }
+        else if (pendingCount >= 2){
+            throw new SQLException("You have reached maximum reserved/loaned books.");
+        }
+
+        updateBookStatus(con,data,"ON-LOAN");
     }
 
-    private String getPatronModeQuery(String[] data, String mode, String statusDate) throws SQLException {
+    public static void returnValidation(Connection con, String[] data) throws SQLException {
+        String currentStatus = null;
+        String statusDate = null;
+
+        PreparedStatement ps = con.prepareStatement(BOOK_STATUS_QUERY);
+        ps.setString(1,data[4]);
+        ps.setString(2,data[5]);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()){
+            currentStatus = rs.getString(1);
+            statusDate = rs.getString(2);
+        }
+        else {
+            throw new SQLException("Book does not exist.");
+        }
+
+        String loginID = getPatronModeQuery(con,data, "LOAN",statusDate);
+
+        if (!currentStatus.equals("ON-LOAN")){
+            throw new SQLException("The book is already returned.");
+        }
+        else if (loginID != null && !loginID.equals(data[3])){
+            throw new SQLException("You cannot return a book that has been loaned by another patron.");
+        }
+
+        int statusInterval = getDayInterval(statusDate, data[1]);
+
+        if (statusInterval > 7){
+            statusInterval -= 7;
+            int penaltyFee = statusInterval * 20;
+            CallableStatement cs = con.prepareCall("{call update_user_fine(?,?)}");
+            cs.setString(1,data[3]);
+            cs.setInt(2,penaltyFee);
+            cs.executeUpdate();
+        }
+
+        updateBookStatus(con,data,"ON-SHELF");
+    }
+
+    public static void reserveValidation(Connection con, String[] data) throws SQLException {
+        String currentStatus = null;
+        String statusDate = null;
+
+        PreparedStatement ps = con.prepareStatement(BOOK_STATUS_QUERY);
+        ps.setString(1,data[4]);
+        ps.setString(2,data[5]);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()){
+            currentStatus = rs.getString(1);
+            statusDate = rs.getString(2);
+        }
+        else {
+            throw new SQLException("Book does not exist.");
+        }
+
+        String loginID = getPatronModeQuery(con,data,"RESERVE",statusDate);
+                
+        int loanCount = getModeCountQuery(con,data,"LOAN");
+        int returnCount = getModeCountQuery(con,data,"RETURN");
+        int reserveCount = getModeCountQuery(con,data,"RESERVE");
+
+        int statusInterval = getDayInterval(statusDate, data[1]);
+
+        reserveCount = (reserveCount - returnCount < 0) ? 0 : reserveCount - returnCount;
+
+        int pendingCount = loanCount - returnCount + reserveCount;
+
+        if (currentStatus.equals("ON-HOLD") && loginID != null && loginID.equals(data[3])){
+            throw new SQLException("You already reserve the book.");
+        }
+
+        if (currentStatus.equals("ON-LOAN")){
+            throw new SQLException("The book is not available for reserve.");
+        }
+        else if (currentStatus.equals("ON-HOLD") && loginID != null && !loginID.equals(data[3]) && statusInterval <= 7){
+            throw new SQLException("The book is reserved for another patron.");
+        }
+        else if (pendingCount >= 2){
+            throw new SQLException("You have reached maximum reserved/loaned books.");
+        }
+
+        updateBookStatus(con,data,"ON-HOLD");
+    }
+
+    public static String getPatronModeQuery(Connection con, String[] data, String mode, String statusDate) throws SQLException {
         String result = null;
         PreparedStatement preparedStatement = con.prepareStatement(PATRON_MODE_QUERY);
         preparedStatement.setString(1,mode);
@@ -690,7 +727,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         return result;
     }
 
-    private int getModeCountQuery(String[] data, String mode) throws SQLException {
+    public static int getModeCountQuery(Connection con, String[] data, String mode) throws SQLException {
         int result = 0;
         PreparedStatement preparedStatement = con.prepareStatement(COUNT_MODE_QUERY);
         preparedStatement.setString(1,data[3]);
@@ -701,7 +738,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         return result;
     }
 
-    private int getDayInterval(String startStr, String endStr) throws SQLException {
+    public static int getDayInterval(String startStr, String endStr) throws SQLException {
         Date startDate = null;
         Date endDate = null;
         int days = 0;
@@ -720,7 +757,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         return days;
     }
 
-    private void updateBookStatus(String[] data, String status) throws SQLException {
+    public static void updateBookStatus(Connection con, String[] data, String status) throws SQLException {
         CallableStatement cs = con.prepareCall("{call update_book_status(?,?,?,to_date(?,'yyyy-mm-dd hh24:mi:ss'))}");
         cs.setString(1,data[4]);
         cs.setString(2,data[5]);
@@ -1051,7 +1088,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         + tableNames[table] + "/s?", deleteButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
         if (response == JOptionPane.YES_OPTION){
-            for (int i = 0; i < keys.get(0).length; ++i){
+            for (int i = 0; i < rows.length; ++i){
 
                 CallableStatement cs = null;
 
