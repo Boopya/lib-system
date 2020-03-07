@@ -556,8 +556,6 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
     }
 
     private void transactionValidation(String[] data) throws SQLException {
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
         String currentStatus = null;
         String statusDate = null;
         String loginID = null;
@@ -583,24 +581,14 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         switch (data[2]) {
 
             case "LOAN":
-            
-                preparedStatement = con.prepareStatement(RESERVE_PATRON_QUERY);
-                preparedStatement.setString(1,statusDate);
-                resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()){
-                    loginID = resultSet.getString(1);
-                }
+
+                loginID = getPatronModeQuery(data,"RESERVE");
 
                 loanCount = getModeCountQuery(data,"LOAN");
                 returnCount = getModeCountQuery(data,"RETURN");
                 reserveCount = getModeCountQuery(data,"RESERVE");
 
-                if (reserveCount - loanCount < 0){
-                    reserveCount = 0;
-                }
-                else {
-                    reserveCount -= loanCount;
-                }
+                reserveCount = (reserveCount - returnCount < 0) ? 0 : reserveCount - returnCount;
 
                 pendingCount = loanCount - returnCount + reserveCount;
 
@@ -610,7 +598,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                     throw new SQLException("The book is already loaned.");
                 }
                 else if (currentStatus.equals("ON-HOLD") && loginID != null && !loginID.equals(data[3]) && statusInterval <= 7){
-                    throw new SQLException("The book is reserved to another patron.");
+                    throw new SQLException("The book is reserved for another patron.");
                 }
                 else if (pendingCount >= 2){
                     throw new SQLException("You have reached maximum reserved/loaned books.");
@@ -622,14 +610,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
             case "RETURN":
 
-                preparedStatement = con.prepareStatement(LOAN_PATRON_QUERY);
-                preparedStatement.setString(1,statusDate);
-                preparedStatement.setString(2,data[4]);
-                preparedStatement.setString(3,data[5]);
-                resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()){
-                    loginID = resultSet.getString(1);
-                }
+                loginID = getPatronModeQuery(data, "LOAN");
 
                 if (!currentStatus.equals("ON-LOAN")){
                     throw new SQLException("The book is already returned.");
@@ -654,22 +635,28 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                 break;
 
             case "RESERVE":
+
+                loginID = getPatronModeQuery(data,"RESERVE");
                 
                 loanCount = getModeCountQuery(data,"LOAN");
                 returnCount = getModeCountQuery(data,"RETURN");
                 reserveCount = getModeCountQuery(data,"RESERVE");
 
-                if (reserveCount - returnCount < 0){
-                    reserveCount = 0;
-                }
-                else {
-                    reserveCount -= returnCount;
-                }
+                statusInterval = getDayInterval(statusDate, data[1]);
+
+                reserveCount = (reserveCount - returnCount < 0) ? 0 : reserveCount - returnCount;
 
                 pendingCount = loanCount - returnCount + reserveCount;
 
-                if (!currentStatus.equals("ON-SHELF")){
+                if (currentStatus.equals("ON-HOLD") && loginID != null && loginID.equals(data[3])){
+                    throw new SQLException("You already reserve the book.");
+                }
+
+                if (currentStatus.equals("ON-LOAN")){
                     throw new SQLException("The book is not available for reserve.");
+                }
+                else if (currentStatus.equals("ON-HOLD") && loginID != null && !loginID.equals(data[3]) && statusInterval <= 7){
+                    throw new SQLException("The book is reserved for another patron.");
                 }
                 else if (pendingCount >= 2){
                     throw new SQLException("You have reached maximum reserved/loaned books.");
@@ -686,6 +673,18 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         }
     }
 
+    private String getPatronModeQuery(String[] data, String mode) throws SQLException {
+        String result = null;
+        PreparedStatement preparedStatement = con.prepareStatement(PATRON_MODE_QUERY);
+        preparedStatement.setString(1,mode);
+        preparedStatement.setString(2,data[1]);
+        preparedStatement.setString(3,data[4]);
+        preparedStatement.setString(4,data[5]);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) result = resultSet.getString(1);
+        return result;
+    }
+
     private int getModeCountQuery(String[] data, String mode) throws SQLException {
         int result = 0;
         PreparedStatement preparedStatement = con.prepareStatement(COUNT_MODE_QUERY);
@@ -693,10 +692,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         preparedStatement.setString(2,mode);
         preparedStatement.setString(3,data[1]);
         ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()){
-            result = Integer.valueOf(resultSet.getString(1));
-        }
-
+        if (resultSet.next()) result = resultSet.getInt(1);
         return result;
     }
 
