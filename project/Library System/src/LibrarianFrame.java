@@ -10,7 +10,6 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 import java.sql.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
@@ -227,27 +226,11 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             panels[i].add(finishButtons[i], constraints);
         }
 
-        String[] access = new String[tables.length];
-        try {
-            PreparedStatement preparedStatement = con.prepareStatement(ACCESS_QUERY);
-            preparedStatement.setString(1,loginId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()){
-                for (int i = 0; i < access.length; ++i){
-                    access[i] = resultSet.getString(i+1);
-                    if (access[i].charAt(0) == '0') addButtons[i].setEnabled(false);
-                    if (access[i].charAt(1) == '0') editButtons[i].setEnabled(false);
-                    if (access[i].charAt(2) == '0') deleteButtons[i].setEnabled(false);
-                }
-            }
-            resultSet.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
         tablesTabbedPane.setFocusable(false);
 
         add(tablesTabbedPane);
+
+        initializeLibrarianAccess();
 
         pack();
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -302,6 +285,27 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         }
 
         return data;
+    }
+
+    private void initializeLibrarianAccess() {
+        String[] access = new String[tables.length];
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(ACCESS_QUERY);
+            preparedStatement.setString(1,loginId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+                for (int i = 0; i < access.length; ++i){
+                    access[i] = resultSet.getString(i+1);
+                    if (access[i].charAt(0) == '0') addButtons[i].setEnabled(false);
+                    if (access[i].charAt(1) == '0') editButtons[i].setEnabled(false);
+                    if (access[i].charAt(2) == '0') deleteButtons[i].setEnabled(false);
+                }
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
+            "SQLException", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void createLoginFrame() {
@@ -379,96 +383,51 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
         Object[] field = null;
 
-        Calendar calendar = Calendar.getInstance();
-        Date initDate = calendar.getTime();
-        calendar.add(Calendar.YEAR, -100);
-        Date startDate = calendar.getTime();
-        calendar.add(Calendar.YEAR, 200);
-        Date endDate = calendar.getTime();
-        SpinnerModel dateModel = new SpinnerDateModel(initDate, startDate, endDate, Calendar.DAY_OF_MONTH);
-        JSpinner dateSpinner = new JSpinner(dateModel);
-        dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy"));
+        JSpinner dateSpinner = initializeDateSpinner();
 
-        Statement statement;
-        statement = con.createStatement();
-        ResultSet rs;
+        switch (table) {
+            case 0:
+                Vector<String> loginID = singleDistinctQuery(TABLES[1], PATRON_COLUMNS[0]);
+                Vector<String> isbn = singleDistinctQuery(TABLES[2], BOOK_COLUMNS[0]);
+                Vector<String> copyNumber = singleDistinctQuery(TABLES[2], BOOK_COLUMNS[1]);
 
-        if (table == 0) {
+                field = new Object[] { new JTextField(), dateSpinner,
+                    new JComboBox<String>(TRANSACTION_MODE), new JComboBox<String>(loginID), 
+                    new JComboBox<String>(isbn), new JComboBox<String>(copyNumber) };
 
-            rs = statement.executeQuery("SELECT LOGINID FROM PATRON");
+                break;
 
-            Vector<String> loginID = new Vector<String>();
+            case 1:
 
-            while (rs.next()){
-                    loginID.add(rs.getString(1));
-            }
+                field = new Object[] { new JTextField(), new JTextField(), new JTextField(), 
+                    new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
+                    new JTextField(), new JTextField(), new JTextField() };
 
-            rs = statement.executeQuery("SELECT ISBN, COPYNUMBER FROM BOOK");
+                break;
 
-            Vector<String> isbn = new Vector<String>();
-            Vector<String> copynumber = new Vector<String>();
+            case 2:
+                Vector<String> shelfID = singleDistinctQuery(TABLES[4], SHELF_COLUMNS[0]);
 
-            while (rs.next()){
-                    boolean isISBNDuplicate = false;
-                    boolean isCopyNumDuplicate = false;
+                field = new Object[] { 
+                    new JTextField(), new JTextField(), new JTextField(), new JTextField(),
+                    new JComboBox<String>(CURRENT_STATUS), dateSpinner, new JComboBox<String>(shelfID) };
 
-                    for (String value : isbn){
-                            if (value.equals(rs.getString(1))){
-                                    isISBNDuplicate = true;
-                                    break;
-                            }
-                    }
+                break;
 
-                    for (String value : copynumber){
-                            if (value.equals(rs.getString(2))){
-                                    isCopyNumDuplicate = true;
-                                    break;
-                            }
-                    }
+            case 3:
 
-                    if (!isISBNDuplicate){
-                            isbn.add(rs.getString(1));
-                    }
-
-                    if (!isCopyNumDuplicate){
-                            copynumber.add(rs.getString(2));
-                    }
-            }
-
-            field = new Object[] { new JTextField(), dateSpinner,
-                                   new JComboBox<String>(new String[] { "LOAN", "RETURN", "RESERVE" }),
-                                   new JComboBox<String>(loginID), new JComboBox<String>(isbn), 
-                                   new JComboBox<String>(copynumber) };
-
-        }
+                field = new Object[] { 
+                    new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
+                    new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
+                    new JComboBox<String>(ACCESS_PERMISSIONS), new JComboBox<String>(ACCESS_PERMISSIONS),
+                    new JComboBox<String>(ACCESS_PERMISSIONS), new JComboBox<String>(ACCESS_PERMISSIONS) };
+                    
+                break;
         
-        else if (table == 1) {
-            field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
-                    new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(),
-                    new JTextField() };
-        }
-        
-        else if (table == 2) {
-            rs = statement.executeQuery("SELECT SHELFID FROM SHELF");
-
-            Vector<String> shelfID = new Vector<String>();
-
-            while (rs.next()){
-                shelfID.add(rs.getString(1));
-            }
-
-            field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
-                    new JComboBox<String>(new String[] { "ON-SHELF", "ON-HOLD", "ON-LOAN" }), dateSpinner,
-                    new JComboBox<String>(shelfID) };
-        } 
-        
-        else if (table == 3) {
-            String[] access = { "111", "110", "100", "000", "001", "011", "010", "101" };
-
-            field = new Object[] { new JTextField(), new JTextField(), new JTextField(), new JTextField(),
-                                   new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(),
-                                   new JTextField(), new JComboBox<String>(access), new JComboBox<String>(access),
-                                   new JComboBox<String>(access), new JComboBox<String>(access) };
+            default:
+                JOptionPane.showMessageDialog(rootPane, "Unexpected Behavior", 
+                "Error!", JOptionPane.ERROR_MESSAGE);
+                break;
         }
 
         for (int i = 0, j = 0; i < prompt.length; ++j) {
@@ -495,68 +454,69 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                             String[] data = new String[columnNames[table].length];
                             CallableStatement cs = null;
 
-                            if (table == 0) {
-                                for (int i = 0, j = 0; i < data.length; ++j){
-                                    if (i == 0){
+                            switch (table) {
+                                case 0:
+
+                                    for (int i = 0, j = 0; i < data.length; ++j){
+                                        if (i == 0) {
+                                            data[i++] = ((JTextField) prompt[++j]).getText();
+                                        } else if (i == 1) {
+                                            data[i++] = DATEFORMAT.format(((JSpinner)prompt[++j]).getValue());
+                                        } else { 
+                                            data[i++] = String.valueOf(((JComboBox<?>)prompt[++j]).getSelectedItem());
+                                        }
+                                    }
+
+                                    transactionValidation(data);
+
+                                    cs = con.prepareCall("{call add_transaction(?,to_date(?,'yyyy-mm-dd hh24:mi:ss'),?,?,?,?)}");
+
+                                    break;
+
+                                case 1:
+
+                                    for (int i = 0, j = 0; i < data.length; ++j){
                                         data[i++] = ((JTextField) prompt[++j]).getText();
                                     }
-                                    else if (i == 1){
-                                        data[i++] = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-                                        .format(((JSpinner)prompt[++j]).getValue());
-                                    }
-                                    else {
-                                        data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
-                                        .getSelectedItem());
-                                    }
-                                }
 
-                                if (data[2].equals("LOAN")){
-                                    cs = con.prepareCall("{call loan_book(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
-                                }
-                                else if (data[2].equals("RETURN")){
-                                    cs = con.prepareCall("{call return_book(?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
-                                }
-                            }
+                                    cs = con.prepareCall("{call add_user(?,?,?,?,?,?,?,?,?,?)}");
+                                    
+                                    break;
+
+                                case 2:
+
+                                    for (int i = 0, j = 0; i < data.length; ++j){
+                                        if (i < data.length - 3) {
+                                            data[i++] = ((JTextField) prompt[++j]).getText();
+                                        } else if (i == 5) {
+                                            data[i++] = DATEFORMAT.format(((JSpinner)prompt[++j]).getValue());
+                                        } else {
+                                            data[i++] = String.valueOf(((JComboBox<?>)prompt[++j]).getSelectedItem());
+                                        }
+                                    }
+
+                                    cs = con.prepareCall("{call add_book(?,?,?,?,?,to_date(?,'yyyy-mm-dd hh24:mi:ss'),?)}");
+                                    
+                                    break;
+
+                                case 3:
+
+                                    for (int i = 0, j = 0; i < data.length; ++j) {
+                                        if (i < data.length - 4) {
+                                            data[i++] = ((JTextField) prompt[++j]).getText();
+                                        } else {
+                                            data[i++] = String.valueOf(((JComboBox<?>)prompt[++j]).getSelectedItem());
+                                        }
+                                    }
+
+                                    cs = con.prepareCall("{call add_librarian(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                                    
+                                    break;
                             
-                            else if (table == 1) {
-                                for (int i = 0, j = 0; i < data.length; ++j) {
-                                    data[i++] = ((JTextField) prompt[++j]).getText();
-                                }
-
-                                cs = con.prepareCall("{call add_user(?,?,?,?,?,?,?,?,?,?)}");
-                            }
-                            
-                            else if (table == 2) {
-                                for (int i = 0, j = 0; i < data.length; ++j){
-                                    if (i < data.length - 3){
-                                        data[i++] = ((JTextField) prompt[++j]).getText();
-                                    }
-                                    else if (i == 5){
-                                        data[i++] = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-                                        .format(((JSpinner)prompt[++j]).getValue());
-                                    }
-                                    else {
-                                        data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
-                                        .getSelectedItem());
-                                    }
-                                }
-
-                                cs = con.prepareCall("{call add_book(?,?,?,?,?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?)}");
-
-                            }
-                            
-                            else if (table == 3) {
-                                for (int i = 0, j = 0; i < data.length; ++j) {
-                                    if (i < data.length - 4) {
-                                        data[i++] = ((JTextField) prompt[++j]).getText();
-                                    }
-                                    else {
-                                        data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
-                                        .getSelectedItem());
-                                    }
-                                }
-
-                                cs = con.prepareCall("{call add_librarian(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                                default:
+                                    JOptionPane.showMessageDialog(rootPane, "Unexpected Behavior", 
+                                    "Error!", JOptionPane.ERROR_MESSAGE);
+                                    break;
                             }
 
                             for (int i = 0; i < data.length; ++i) {
@@ -565,27 +525,19 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
                             cs.executeUpdate();
 
-                            if (table != 0){
-                                tableModels[table].addRow(data);
+                            Object[][][] dataModels = getData(con);
+                            for (int i = 0; i < tableModels.length; ++i){
+                                tableModels[i].setDataVector(dataModels[i], columnNames[i]);
+                                tableModels[i].fireTableDataChanged();
                             }
-                            else {
-                                try {
-                                    Object[][][] dataModels = getData(con);
-                                    for (int i = 0; i < tableModels.length; ++i){
-                                        tableModels[i].setDataVector(dataModels[i],columnNames[i]);
-                                        tableModels[i].fireTableDataChanged();
-                                    }
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            
+
                             dialog.dispose();
 
                             JOptionPane.showMessageDialog(rootPane,tableNames[table] + " Added!", 
                             addButtons[table].getText(),JOptionPane.INFORMATION_MESSAGE);
                         } 
                         catch (SQLException e) {
+                            e.printStackTrace();
                                 JOptionPane.showMessageDialog(rootPane, e.getMessage(),
                                 "SQLException",JOptionPane.ERROR_MESSAGE);
                         }
@@ -602,6 +554,179 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+    }
+
+    private void transactionValidation(String[] data) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        String currentStatus = null;
+        String statusDate = null;
+        String loginID = null;
+        int loanCount = 0;
+        int returnCount = 0;
+        int reserveCount = 0;
+        int pendingCount = 0;
+        int statusInterval = 0;
+        int penaltyFee = 0;
+
+        PreparedStatement ps = con.prepareStatement(BOOK_STATUS_QUERY);
+        ps.setString(1,data[4]);
+        ps.setString(2,data[5]);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()){
+            currentStatus = rs.getString(1);
+            statusDate = rs.getString(2);
+        }
+        else {
+            throw new SQLException("Book does not exist.");
+        }
+
+        switch (data[2]) {
+
+            case "LOAN":
+            
+                preparedStatement = con.prepareStatement(RESERVE_PATRON_QUERY);
+                preparedStatement.setString(1,statusDate);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()){
+                    loginID = resultSet.getString(1);
+                }
+
+                loanCount = getModeCountQuery(data,"LOAN");
+                returnCount = getModeCountQuery(data,"RETURN");
+                reserveCount = getModeCountQuery(data,"RESERVE");
+
+                if (reserveCount - loanCount < 0){
+                    reserveCount = 0;
+                }
+                else {
+                    reserveCount -= loanCount;
+                }
+
+                pendingCount = loanCount - returnCount + reserveCount;
+
+                statusInterval = getDayInterval(statusDate, data[1]);
+
+                if (currentStatus.equals("ON-LOAN")){
+                    throw new SQLException("The book is already loaned.");
+                }
+                else if (currentStatus.equals("ON-HOLD") && loginID != null && !loginID.equals(data[3]) && statusInterval <= 7){
+                    throw new SQLException("The book is reserved to another patron.");
+                }
+                else if (pendingCount >= 2){
+                    throw new SQLException("You have reached maximum reserved/loaned books.");
+                }
+
+                updateBookStatus(data,"ON-LOAN");
+
+                break;
+
+            case "RETURN":
+
+                preparedStatement = con.prepareStatement(LOAN_PATRON_QUERY);
+                preparedStatement.setString(1,statusDate);
+                preparedStatement.setString(2,data[4]);
+                preparedStatement.setString(3,data[5]);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()){
+                    loginID = resultSet.getString(1);
+                }
+
+                if (!currentStatus.equals("ON-LOAN")){
+                    throw new SQLException("The book is already returned.");
+                }
+                else if (loginID != null && !loginID.equals(data[3])){
+                    throw new SQLException("You cannot return a book that has been loaned by another patron.");
+                }
+
+                statusInterval = getDayInterval(statusDate, data[1]);
+
+                if (statusInterval > 7){
+                    statusInterval -= 7;
+                    penaltyFee = statusInterval * 20;
+                    CallableStatement cs = con.prepareCall("{call update_user_fine(?,?)}");
+                    cs.setString(1,data[3]);
+                    cs.setInt(2,penaltyFee);
+                    cs.executeUpdate();
+                }
+
+                updateBookStatus(data,"ON-SHELF");
+                
+                break;
+
+            case "RESERVE":
+                
+                loanCount = getModeCountQuery(data,"LOAN");
+                returnCount = getModeCountQuery(data,"RETURN");
+                reserveCount = getModeCountQuery(data,"RESERVE");
+
+                if (reserveCount - returnCount < 0){
+                    reserveCount = 0;
+                }
+                else {
+                    reserveCount -= returnCount;
+                }
+
+                pendingCount = loanCount - returnCount + reserveCount;
+
+                if (!currentStatus.equals("ON-SHELF")){
+                    throw new SQLException("The book is not available for reserve.");
+                }
+                else if (pendingCount >= 2){
+                    throw new SQLException("You have reached maximum reserved/loaned books.");
+                }
+
+                updateBookStatus(data,"ON-HOLD");
+                
+                break;
+        
+            default:
+                JOptionPane.showMessageDialog(rootPane, "Unexpected Behavior", 
+                "Error!", JOptionPane.ERROR_MESSAGE);
+                break;
+        }
+    }
+
+    private int getModeCountQuery(String[] data, String mode) throws SQLException {
+        int result = 0;
+        PreparedStatement preparedStatement = con.prepareStatement(COUNT_MODE_QUERY);
+        preparedStatement.setString(1,data[3]);
+        preparedStatement.setString(2,mode);
+        preparedStatement.setString(3,data[1]);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()){
+            result = Integer.valueOf(resultSet.getString(1));
+        }
+
+        return result;
+    }
+
+    private int getDayInterval(String startStr, String endStr) throws SQLException {
+        Date startDate = null;
+        Date endDate = null;
+        int days = 0;
+        try {
+            startDate = DATEFORMAT.parse(startStr);
+            endDate = DATEFORMAT.parse(endStr);
+            days = (int)((endDate.getTime() - startDate.getTime())/(1000*60*60*24));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (days < 0){
+            throw new SQLException("Invalid date interval.");
+        }
+
+        return days;
+    }
+
+    private void updateBookStatus(String[] data, String status) throws SQLException {
+        CallableStatement cs = con.prepareCall("{call update_book_status(?,?,?,to_date(?,'yyyy-mm-dd hh24:mi:ss'))}");
+        cs.setString(1,data[4]);
+        cs.setString(2,data[5]);
+        cs.setString(3,status);
+        cs.setString(4,data[1]);
+        cs.executeUpdate();
     }
 
     private class EditListener implements ActionListener {
@@ -637,142 +762,91 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
         Object[] field = null;
 
-        Calendar calendar = Calendar.getInstance();
-        Date initDate = calendar.getTime();
-        calendar.add(Calendar.YEAR, -100);
-        Date startDate = calendar.getTime();
-        calendar.add(Calendar.YEAR, 200);
-        Date endDate = calendar.getTime();
-        SpinnerModel dateModel = new SpinnerDateModel(initDate, startDate, endDate, Calendar.DAY_OF_MONTH);
-        JSpinner dateSpinner = new JSpinner(dateModel);
-        dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy"));
+        JSpinner dateSpinner = initializeDateSpinner();
 
-        Statement statement;
-        statement = con.createStatement();
-        ResultSet rs;
+        switch (table) {
+            case 0:
+                Vector<String> loginID = singleDistinctQuery(TABLES[1], PATRON_COLUMNS[0]);
+                Vector<String> isbn = singleDistinctQuery(TABLES[2], BOOK_COLUMNS[0]);
+                Vector<String> copyNumber = singleDistinctQuery(TABLES[2], BOOK_COLUMNS[1]);
 
-        if(table == 0) {
-            dateSpinner.setValue(new SimpleDateFormat("yyyy-MM-dd")
-            .parse(values[1].substring(0,10)));
+                JTextField transactionID = new JTextField(values[0]);
+                transactionID.setEditable(false);
+                dateSpinner.setValue(SPINNER_DATEFORMAT.parse(values[1].substring(0,10)));
+                JComboBox<String> transactionModes = new JComboBox<String>(TRANSACTION_MODE);
+                transactionModes.setSelectedItem(values[2]);
+                JComboBox<String> loginIDs = new JComboBox<String>(loginID);
+                loginIDs.setSelectedItem(values[3]);
+                JComboBox<String> isbns = new JComboBox<String>(isbn);
+                isbns.setSelectedItem(values[4]);
+                JComboBox<String> copyNumbers = new JComboBox<String>(copyNumber);
+                copyNumbers.setSelectedItem(values[5]);
 
-            JComboBox<String> modes = new JComboBox<String>(new String[]{ "LOAN", "RETURN", "RESERVE" });
-            modes.setSelectedItem(values[2]);
+                field = new Object[] { 
+                    transactionID, dateSpinner, transactionModes,
+                    loginIDs, isbns, copyNumbers };
+                
+                break;
 
-            Vector<String>[] vectors = new Vector[3];
-            JComboBox<?>[] comboBoxes = new JComboBox[vectors.length];
+            case 1:
+                
+                JTextField loginIDField = new JTextField(values[0]);
+                loginIDField.setEditable(false);
 
-            for (int i = 0; i < vectors.length; ++i){
-                    vectors[i] = new Vector<String>();
-            }
-
-            rs = statement.executeQuery("SELECT LOGINID FROM PATRON");
-            while (rs.next()){
-                    vectors[0].add(rs.getString(1));
-            }
-
-            rs = statement.executeQuery("SELECT ISBN, COPYNUMBER FROM BOOK");
-            while (rs.next()){
-                    boolean isISBNDuplicate = false;
-                    boolean isCopyNumDuplicate = false;
-
-                    for (String isbn : vectors[1]){
-                        if (isbn.equals(rs.getString(1))){
-                            isISBNDuplicate = true;
-                            break;
-                        }
-                    }
-
-                    for (String cpnum : vectors[2]){
-                        if (cpnum.equals(rs.getString(2))){
-                            isCopyNumDuplicate = true;
-                            break;
-                        }
-                    }
-
-                    if (!isISBNDuplicate){
-                        vectors[1].add(rs.getString(1));
-                    }
-
-                    if (!isCopyNumDuplicate){
-                        vectors[2].add(rs.getString(2));
-                    }
-            }
-
-            for (int i = 0; i < comboBoxes.length; ++i){
-                comboBoxes[i] = new JComboBox<String>(vectors[i]);
-                comboBoxes[i].setSelectedItem(values[3+i]);
-            }
-
-            JTextField transIdField = new JTextField(values[0]);
-            transIdField.setEditable(false);
-
-            field = new Object[] { 
-                transIdField, dateSpinner, modes,
-                comboBoxes[0], comboBoxes[1], comboBoxes[2] };
-
-        }
-        
-        else if(table == 1) {
-            JTextField loginIdField = new JTextField(values[0]);
-            loginIdField.setEditable(false);
-
-            field = new Object[] { 
-                    loginIdField, new JTextField(values[1]),
+                field = new Object[] { 
+                    loginIDField, new JTextField(values[1]),
                     new JTextField(values[2]), new JTextField(values[3]),
                     new JTextField(values[4]), new JTextField(values[5]),
                     new JTextField(values[6]), new JTextField(values[7]),
                     new JTextField(values[8]), new JTextField(values[9]) };
-        }
-        
-        else if(table == 2) {
-            dateSpinner.setValue(new SimpleDateFormat("yyyy-MM-dd")
-            .parse(values[5].substring(0,10)));
+                    
+                break;
 
-            rs = statement.executeQuery("SELECT SHELFID FROM SHELF");
-
-            Vector<String> shelfID = new Vector<String>();
-
-            while (rs.next()){
-                shelfID.add(rs.getString(1));
-            }
-
-            JComboBox<String> shelfBox = new JComboBox<String>(shelfID);
-            shelfBox.setSelectedItem(values[6]);
-
-            JComboBox<String> status = new JComboBox<String>(new String[]{ "ON-SHELF", "ON-HOLD", "ON-LOAN" });
-            status.setSelectedItem(values[4]);
-
-            JTextField isbnField = new JTextField(values[0]);
-            JTextField cpNumField = new JTextField(values[1]);
-            isbnField.setEditable(false);
-            cpNumField.setEditable(false);
-
-            field = new Object[] { 
-                    isbnField, cpNumField, 
+            case 2:
+                
+                JTextField isbnField = new JTextField(values[0]);
+                isbnField.setEditable(false);
+                JTextField copyNumberField = new JTextField(values[1]);
+                copyNumberField.setEditable(false);
+                JComboBox<String> status = new JComboBox<String>(CURRENT_STATUS);
+                status.setSelectedItem(values[4]);
+                dateSpinner.setValue(SPINNER_DATEFORMAT.parse(values[5].substring(0,10)));
+                Vector<String> shelfID = singleDistinctQuery(TABLES[4], SHELF_COLUMNS[0]);
+                JComboBox<String> shelves = new JComboBox<String>(shelfID);
+                shelves.setSelectedItem(values[6]);
+                
+                field = new Object[] { isbnField, copyNumberField,
                     new JTextField(values[2]), new JTextField(values[3]),
-                    status, dateSpinner, shelfBox };
-        }
-        
-        else if(table == 3) {
-            String[] access = { "111", "110", "100", "000", "001", "011", "010", "101" };
+                    status, dateSpinner, shelves };
 
-            JComboBox<?>[] comboBoxes = new JComboBox[4];
+                break;
 
-            for (int i = 0; i < comboBoxes.length; ++i){
-                comboBoxes[i] = new JComboBox<String>(access);
-                comboBoxes[i].setSelectedItem(values[10+i]);
+            case 3:
+
+                JTextField libIDField = new JTextField(values[0]);
+                libIDField.setEditable(false);
+
+                JComboBox<?>[] access = new JComboBox[4];
+
+            for (int i = 0; i < access.length; ++i){
+                access[i] = new JComboBox<String>(ACCESS_PERMISSIONS);
+                access[i].setSelectedItem(values[10+i]);
             }
 
-            JTextField loginIdField = new JTextField(values[0]);
-            loginIdField.setEditable(false);
-
-            field = new Object[] { 
-                    loginIdField, new JTextField(values[1]),
+                field = new Object[] { 
+                    libIDField, new JTextField(values[1]),
                     new JTextField(values[2]), new JTextField(values[3]),
                     new JTextField(values[4]), new JTextField(values[5]),
                     new JTextField(values[6]), new JTextField(values[7]),
                     new JTextField(values[8]), new JTextField(values[9]),
-                    comboBoxes[0], comboBoxes[1], comboBoxes[2], comboBoxes[3]};
+                    access[0], access[1], access[2], access[3] };
+                
+                break;
+        
+            default:
+                JOptionPane.showMessageDialog(rootPane, "Unexpected Behavior", 
+                "Error!", JOptionPane.ERROR_MESSAGE);
+                break;
         }
 
         for(int i = 0, j = 0; i < prompt.length; ++j) {
@@ -799,61 +873,67 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                             String[] data = new String[columnNames[table].length];
                             CallableStatement cs = null;
 
-                            if (table == 0){
-                                for (int i = 0, j = 0; i < data.length; ++j){
-                                    if (i == 0){
+                            switch (table) {
+                                case 0:
+
+                                    for (int i = 0, j = 0; i < data.length; ++j){
+                                        if (i == 0) {
+                                            data[i++] = ((JTextField) prompt[++j]).getText();
+                                        } else if (i == 1) {
+                                            data[i++] = DATEFORMAT.format(((JSpinner)prompt[++j]).getValue());
+                                        } else { 
+                                            data[i++] = String.valueOf(((JComboBox<?>)prompt[++j]).getSelectedItem());
+                                        }
+                                    }
+
+                                    cs = con.prepareCall("{call edit_transaction(?,?,to_date(?,'yyyy-mm-dd hh24:mi:ss'),?,?,?,?)}");
+                                    
+                                    break;
+
+                                case 1:
+
+                                    for (int i = 0, j = 0; i < data.length; ++j){
                                         data[i++] = ((JTextField) prompt[++j]).getText();
                                     }
-                                    else if (i == 1){
-                                        data[i++] = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-                                        .format(((JSpinner)prompt[++j]).getValue());
-                                    }
-                                    else {
-                                        data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
-                                        .getSelectedItem());
-                                    }
-                                }
 
-                                cs = con.prepareCall("{call edit_transaction(?,?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?,?,?,?)}");
-                            }
+                                    cs = con.prepareCall("{call edit_user(?,?,?,?,?,?,?,?,?,?,?)}");
+                                    
+                                    break;
+
+                                case 2:
+
+                                    for (int i = 0, j = 0; i < data.length; ++j){
+                                        if (i < data.length - 3) {
+                                            data[i++] = ((JTextField) prompt[++j]).getText();
+                                        } else if (i == 5) {
+                                            data[i++] = DATEFORMAT.format(((JSpinner)prompt[++j]).getValue());
+                                        } else {
+                                            data[i++] = String.valueOf(((JComboBox<?>)prompt[++j]).getSelectedItem());
+                                        }
+                                    }
+
+                                    cs = con.prepareCall("{call edit_book(?,?,?,?,?,?,?,to_date(?,'yyyy-mm-dd hh24:mi:ss'),?)}");
+                                    
+                                    break;
+
+                                case 3:
+
+                                    for (int i = 0, j = 0; i < data.length; ++j) {
+                                        if (i < data.length - 4) {
+                                            data[i++] = ((JTextField) prompt[++j]).getText();
+                                        } else {
+                                            data[i++] = String.valueOf(((JComboBox<?>)prompt[++j]).getSelectedItem());
+                                        }
+                                    }
+
+                                    cs = con.prepareCall("{call edit_librarian(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                                    
+                                    break;
                             
-                            else if (table == 1){
-                                for (int i = 0, j = 0; i < data.length; ++j) {
-                                    data[i++] = ((JTextField) prompt[++j]).getText();
-                                }
-
-                                cs = con.prepareCall("{call edit_user(?,?,?,?,?,?,?,?,?,?,?)}");
-                            }
-                            
-                            else if (table == 2){
-                                for (int i = 0, j = 0; i < data.length; ++j){
-                                    if (i < data.length - 3){
-                                        data[i++] = ((JTextField) prompt[++j]).getText();
-                                    }
-                                    else if (i == 5){
-                                        data[i++] = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-                                        .format(((JSpinner)prompt[++j]).getValue());
-                                    }
-                                    else {
-                                        data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
-                                        .getSelectedItem());
-                                    }
-                                }
-
-                                cs = con.prepareCall("{call edit_book(?,?,?,?,?,?,?,to_date(?,'yyyy-MM-dd hh:mi:ss'),?)}");
-                            }
-                            else if (table == 3){
-                                for (int i = 0, j = 0; i < data.length; ++j) {
-                                    if (i < data.length - 4) {
-                                        data[i++] = ((JTextField) prompt[++j]).getText();
-                                    }
-                                    else {
-                                        data[i++] = String.valueOf(((JComboBox<?>)prompt[++j])
-                                        .getSelectedItem());
-                                    }
-                                }
-
-                                cs = con.prepareCall("{call edit_librarian(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                                default:
+                                    JOptionPane.showMessageDialog(rootPane, "Unexpected Behavior", 
+                                    "Error!", JOptionPane.ERROR_MESSAGE);
+                                    break;
                             }
 
                             if (table != 2){
@@ -866,7 +946,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                             else {
                                 cs.setString(1, values[0]);
                                 cs.setString(2, values[1]);
-                                for (int i =0; i < data.length; ++i){
+                                for (int i = 0; i < data.length; ++i){
                                     cs.setString(i + 3, data[i]);
                                 }
                             }
@@ -878,8 +958,10 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
                                 cs.executeUpdate();
 
-                                for (int i = 0; i < columnNames[table].length; ++i){
-                                    tables[table].setValueAt(data[i], row, i);
+                                Object[][][] dataModels = getData(con);
+                                for (int i = 0; i < tableModels.length; ++i){
+                                    tableModels[i].setDataVector(dataModels[i], columnNames[i]);
+                                    tableModels[i].fireTableDataChanged();
                                 }
 
                                 dialog.dispose();
@@ -942,8 +1024,8 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             }
         }
 
-        for (int i = 0; i < keys.size(); ++i){
-            if (keys.get(i)[0].equals(loginId)){
+        for (int i = 0; i < keys.get(0).length; ++i){
+            if (keys.get(0)[i].equals(loginId)){
                 JOptionPane.showMessageDialog(rootPane, 
                 "Invalid Action", "Delete Librarian", 
                 JOptionPane.ERROR_MESSAGE);
@@ -956,39 +1038,76 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
         if (response == JOptionPane.YES_OPTION){
             for (int i = 0; i < keys.get(0).length; ++i){
-                for (int j = 0; j < tableModels[table].getRowCount(); ++j){
-                    String modelKey = String.valueOf(tableModels[table].getValueAt(j,0));
-                    if (keys.get(0)[i].equals(modelKey)){
 
-                        CallableStatement cs = null;
-                        if (table == 0){
-                            cs = con.prepareCall("{call delete_transaction(?)}");
-                            cs.setString(1,keys.get(0)[i]);
-                        }
-                        else if (table == 1){
-                            cs = con.prepareCall("{call delete_user(?)}");
-                            cs.setString(1,keys.get(0)[i]);
-                        }
-                        else if (table == 2){
-                            cs = con.prepareCall("{call delete_book(?,?)}");
-                            cs.setString(1,keys.get(0)[i]);
-                            cs.setString(2,keys.get(1)[i]);
-                        }
-                        else if (table == 3){
-                            cs = con.prepareCall("{call delete_librarian(?)}");
-                            cs.setString(1,keys.get(0)[i]);
-                        }
+                CallableStatement cs = null;
 
-                        cs.executeUpdate();
-                        tableModels[table].removeRow(j);
+                switch (table) {
+                    case 0:
+                        cs = con.prepareCall("{call delete_transaction(?)}");
+                        cs.setString(1,keys.get(0)[i]);
                         break;
-                    }
+
+                    case 1:
+                        cs = con.prepareCall("{call delete_user(?)}");
+                        cs.setString(1,keys.get(0)[i]);
+                        break;
+
+                    case 2:
+                        cs = con.prepareCall("{call delete_book(?,?)}");
+                        cs.setString(1,keys.get(0)[i]);
+                        cs.setString(2,keys.get(1)[i]);
+                        break;
+
+                    case 3:
+                        cs = con.prepareCall("{call delete_librarian(?)}");
+                        cs.setString(1,keys.get(0)[i]);
+                        break;
+                
+                    default:
+                        JOptionPane.showMessageDialog(rootPane, "Unexpected Behavior", 
+                        "Error!", JOptionPane.ERROR_MESSAGE);
+                        break;
                 }
+
+                cs.executeUpdate();
+            }
+
+            Object[][][] dataModels = getData(con);
+            for (int i = 0; i < tableModels.length; ++i){
+                tableModels[i].setDataVector(dataModels[i], columnNames[i]);
+                tableModels[i].fireTableDataChanged();
             }
 
             JOptionPane.showMessageDialog(rootPane, tableNames[table] + " Deleted!",
             deleteButtons[table].getText(), JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    private Vector<String> singleDistinctQuery(String table, String column) throws SQLException {
+        Vector<String> result = new Vector<String>();
+        Statement statement = con.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT DISTINCT " + column + " FROM " + table);
+        while (resultSet.next()) result.add(resultSet.getString(1));
+        return result;
+    }
+
+    private JSpinner initializeDateSpinner(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        Date initDate = calendar.getTime();
+        calendar.add(Calendar.YEAR, -100);
+        Date startDate = calendar.getTime();
+        calendar.add(Calendar.YEAR, 200);
+        Date endDate = calendar.getTime();
+
+        SpinnerModel dateModel = new SpinnerDateModel(initDate, startDate, endDate, Calendar.DAY_OF_MONTH);
+        JSpinner dateSpinner = new JSpinner(dateModel);
+        dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd-MM-yyyy"));
+
+        return dateSpinner;
     }
 
     private class SearchListener extends KeyAdapter implements DocumentListener, ItemListener {
