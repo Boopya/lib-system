@@ -537,7 +537,6 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                             addButtons[table].getText(),JOptionPane.INFORMATION_MESSAGE);
                         } 
                         catch (SQLException e) {
-                            e.printStackTrace();
                                 JOptionPane.showMessageDialog(rootPane, e.getMessage(),
                                 "SQLException",JOptionPane.ERROR_MESSAGE);
                         }
