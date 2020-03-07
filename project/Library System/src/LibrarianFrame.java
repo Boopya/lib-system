@@ -368,6 +368,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                 for (int i = 0; i < addButtons.length; ++i) {
                     if (addButtons[i].equals((JButton) e.getSource())) {
                         createAddDialog(i);
+                        break;
                     }
                 }
             }
@@ -566,6 +567,10 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         int statusInterval = 0;
         int penaltyFee = 0;
 
+        if (data[0].isEmpty()){
+            throw new SQLException("Transaction ID must not be null.");
+        }
+
         PreparedStatement ps = con.prepareStatement(BOOK_STATUS_QUERY);
         ps.setString(1,data[4]);
         ps.setString(2,data[5]);
@@ -582,7 +587,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
             case "LOAN":
 
-                loginID = getPatronModeQuery(data,"RESERVE");
+                loginID = getPatronModeQuery(data,"RESERVE",statusDate);
 
                 loanCount = getModeCountQuery(data,"LOAN");
                 returnCount = getModeCountQuery(data,"RETURN");
@@ -610,7 +615,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
             case "RETURN":
 
-                loginID = getPatronModeQuery(data, "LOAN");
+                loginID = getPatronModeQuery(data, "LOAN",statusDate);
 
                 if (!currentStatus.equals("ON-LOAN")){
                     throw new SQLException("The book is already returned.");
@@ -636,7 +641,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
             case "RESERVE":
 
-                loginID = getPatronModeQuery(data,"RESERVE");
+                loginID = getPatronModeQuery(data,"RESERVE",statusDate);
                 
                 loanCount = getModeCountQuery(data,"LOAN");
                 returnCount = getModeCountQuery(data,"RETURN");
@@ -673,11 +678,11 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         }
     }
 
-    private String getPatronModeQuery(String[] data, String mode) throws SQLException {
+    private String getPatronModeQuery(String[] data, String mode, String statusDate) throws SQLException {
         String result = null;
         PreparedStatement preparedStatement = con.prepareStatement(PATRON_MODE_QUERY);
         preparedStatement.setString(1,mode);
-        preparedStatement.setString(2,data[1]);
+        preparedStatement.setString(2,statusDate);
         preparedStatement.setString(3,data[4]);
         preparedStatement.setString(4,data[5]);
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -735,6 +740,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                         for (int j = 0; j < rows.length; ++j){
                             createEditDialog(i,rows[j]);
                         }
+                        break;
                     }
                 }
             }
@@ -823,10 +829,10 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
                 JComboBox<?>[] access = new JComboBox[4];
 
-            for (int i = 0; i < access.length; ++i){
-                access[i] = new JComboBox<String>(ACCESS_PERMISSIONS);
-                access[i].setSelectedItem(values[10+i]);
-            }
+                for (int i = 0; i < access.length; ++i){
+                    access[i] = new JComboBox<String>(ACCESS_PERMISSIONS);
+                    access[i].setSelectedItem(values[10+i]);
+                }
 
                 field = new Object[] { 
                     libIDField, new JTextField(values[1]),
@@ -946,6 +952,18 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                                 }
                             }
 
+                            boolean isDataUnchanged = true;
+                            for (int i = 0; i < data.length; ++i){
+                                if (!values[i].equals(data[i])){
+                                    isDataUnchanged = false;
+                                    break;
+                                }
+                            }
+                            if (isDataUnchanged){
+                                dialog.dispose();
+                                return;
+                            }
+
                             int response = JOptionPane.showConfirmDialog(rootPane, "Do you want save your changes to:\n" 
                             + values[0], editButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
@@ -993,6 +1011,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                         int[] rows = tables[i].getSelectedRows();
                         if (rows.length == 0) return;
                         createDeleteDialog(i,rows);
+                        break;
                     }
                 }
             }
@@ -1022,14 +1041,14 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         for (int i = 0; i < keys.get(0).length; ++i){
             if (keys.get(0)[i].equals(loginId)){
                 JOptionPane.showMessageDialog(rootPane, 
-                "Invalid Action", "Delete Librarian", 
+                "Invalid Action", deleteButtons[table].getText(), 
                 JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
 
         int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to delete selected " 
-        + tableNames[table] + "/s", deleteButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        + tableNames[table] + "/s?", deleteButtons[table].getText(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
         if (response == JOptionPane.YES_OPTION){
             for (int i = 0; i < keys.get(0).length; ++i){
