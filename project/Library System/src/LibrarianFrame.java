@@ -19,6 +19,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
     private static final long serialVersionUID = 1L;
     private Connection con;
     private JTabbedPane tablesTabbedPane;
+    private JButton payButton;
     private JPanel[] panels;
     private JTable[] tables;
     private String[] tableNames;
@@ -38,87 +39,71 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
     private String loginId;
 
     public LibrarianFrame(Connection con, String loginId) {
-            this.con = con;
-            this.loginId = loginId;
-            setTitle("Librarian");
+        this.con = con;
+        this.loginId = loginId;
+        setTitle("Librarian");
 
-            tableNames = 
-                    new String[] {DatabaseContract.TRANSACTION_TABLE,
-                                  DatabaseContract.PATRON_TABLE,
-                                  DatabaseContract.BOOK_TABLE,
-                                  DatabaseContract.LIBRARIAN_TABLE};
+        tableNames = new String[] { DatabaseContract.TRANSACTION_TABLE, DatabaseContract.PATRON_TABLE,
+                DatabaseContract.BOOK_TABLE, DatabaseContract.LIBRARIAN_TABLE };
 
-            columnNames = new String[][]{
-                    new String[] {DatabaseContract.TransactionTable.TRANSACTION_ID_COLUMN,
-                                  DatabaseContract.TransactionTable.TRANSACTION_DATE_COLUMN,
-                                  DatabaseContract.TransactionTable.TRANSACTION_MODE_COLUMN,
-                                  DatabaseContract.TransactionTable.LOGIN_ID_COLUMN,
-                                  DatabaseContract.TransactionTable.ISBN_COLUMN,
-                                  DatabaseContract.TransactionTable.COPY_NUMBER_COLUMN},
+        columnNames = new String[][] { new String[] { DatabaseContract.TransactionTable.TRANSACTION_ID_COLUMN,
+                DatabaseContract.TransactionTable.TRANSACTION_DATE_COLUMN,
+                DatabaseContract.TransactionTable.TRANSACTION_MODE_COLUMN,
+                DatabaseContract.TransactionTable.LOGIN_ID_COLUMN, DatabaseContract.TransactionTable.ISBN_COLUMN,
+                DatabaseContract.TransactionTable.COPY_NUMBER_COLUMN },
 
-                    new String[] {DatabaseContract.PatronTable.LOGIN_ID_COLUMN,
-                                  DatabaseContract.PatronTable.FIRST_NAME_COLUMN,
-                                  DatabaseContract.PatronTable.MIDDLE_NAME_COLUMN,
-                                  DatabaseContract.PatronTable.LAST_NAME_COLUMN,
-                                  DatabaseContract.PatronTable.PASSWORD_COLUMN,
-                                  DatabaseContract.PatronTable.HOUSE_NO_COLUMN,
-                                  DatabaseContract.PatronTable.STREET_COLUMN,
-                                  DatabaseContract.PatronTable.BARANGAY_COLUMN,
-                                  DatabaseContract.PatronTable.CITY_COLUMN,
-                                  DatabaseContract.PatronTable.UNPAID_FINE_COLUMN},
+                new String[] { DatabaseContract.PatronTable.LOGIN_ID_COLUMN,
+                        DatabaseContract.PatronTable.FIRST_NAME_COLUMN, DatabaseContract.PatronTable.MIDDLE_NAME_COLUMN,
+                        DatabaseContract.PatronTable.LAST_NAME_COLUMN, DatabaseContract.PatronTable.PASSWORD_COLUMN,
+                        DatabaseContract.PatronTable.HOUSE_NO_COLUMN, DatabaseContract.PatronTable.STREET_COLUMN,
+                        DatabaseContract.PatronTable.BARANGAY_COLUMN, DatabaseContract.PatronTable.CITY_COLUMN,
+                        DatabaseContract.PatronTable.UNPAID_FINE_COLUMN },
 
-                    new String[] {DatabaseContract.BookTable.ISBN_COLUMN,
-                                  DatabaseContract.BookTable.COPY_NUMBER_COLUMN,
-                                  DatabaseContract.BookTable.TITLE_COLUMN,
-                                  DatabaseContract.BookTable.YEAR_OF_PUBLICATION_COLUMN,
-                                  DatabaseContract.BookTable.CURRENT_STATUS_COLUMN,
-                                  DatabaseContract.BookTable.STATUS_DATE_COLUMN,
-                                  DatabaseContract.BookTable.SHELF_ID_COLUMN},
+                new String[] { DatabaseContract.BookTable.ISBN_COLUMN, DatabaseContract.BookTable.COPY_NUMBER_COLUMN,
+                        DatabaseContract.BookTable.TITLE_COLUMN, DatabaseContract.BookTable.YEAR_OF_PUBLICATION_COLUMN,
+                        DatabaseContract.BookTable.CURRENT_STATUS_COLUMN, DatabaseContract.BookTable.STATUS_DATE_COLUMN,
+                        DatabaseContract.BookTable.SHELF_ID_COLUMN },
 
-                    new String[] {DatabaseContract.LibrarianTable.LOGIN_ID_COLUMN,
-                                  DatabaseContract.LibrarianTable.FIRST_NAME_COLUMN,
-                                  DatabaseContract.LibrarianTable.MIDDLE_NAME_COLUMN,
-                                  DatabaseContract.LibrarianTable.LAST_NAME_COLUMN,
-                                  DatabaseContract.LibrarianTable.PASSWORD_COLUMN,
-                                  DatabaseContract.LibrarianTable.HOUSE_NO_COLUMN,
-                                  DatabaseContract.LibrarianTable.STREET_COLUMN,
-                                  DatabaseContract.LibrarianTable.BARANGAY_COLUMN,
-                                  DatabaseContract.LibrarianTable.CITY_COLUMN,
-                                  DatabaseContract.LibrarianTable.UNPAID_FINE_COLUMN,
-                                  DatabaseContract.LibrarianTable.PATRON_ACCESS_COLUMN,
-                                  DatabaseContract.LibrarianTable.LIBRARIAN_ACCESS_COLUMN,
-                                  DatabaseContract.LibrarianTable.BOOK_ACCESS_COLUMN,
-                                  DatabaseContract.LibrarianTable.TRANSACTION_ACCESS_COLUMN}
-            };
+                new String[] { DatabaseContract.LibrarianTable.LOGIN_ID_COLUMN,
+                        DatabaseContract.LibrarianTable.FIRST_NAME_COLUMN,
+                        DatabaseContract.LibrarianTable.MIDDLE_NAME_COLUMN,
+                        DatabaseContract.LibrarianTable.LAST_NAME_COLUMN,
+                        DatabaseContract.LibrarianTable.PASSWORD_COLUMN,
+                        DatabaseContract.LibrarianTable.HOUSE_NO_COLUMN, DatabaseContract.LibrarianTable.STREET_COLUMN,
+                        DatabaseContract.LibrarianTable.BARANGAY_COLUMN, DatabaseContract.LibrarianTable.CITY_COLUMN,
+                        DatabaseContract.LibrarianTable.UNPAID_FINE_COLUMN,
+                        DatabaseContract.LibrarianTable.PATRON_ACCESS_COLUMN,
+                        DatabaseContract.LibrarianTable.LIBRARIAN_ACCESS_COLUMN,
+                        DatabaseContract.LibrarianTable.BOOK_ACCESS_COLUMN,
+                        DatabaseContract.LibrarianTable.TRANSACTION_ACCESS_COLUMN } };
 
-            // tables
-            panels = new JPanel[tableNames.length];
-            tables = new JTable[tableNames.length];
-            data = new Object[tables.length][][];
-            tableModels = new DefaultTableModel[tables.length];
-            sorters = new TableRowSorter[tableModels.length];
+        // tables
+        panels = new JPanel[tableNames.length];
+        tables = new JTable[tableNames.length];
+        data = new Object[tables.length][][];
+        tableModels = new DefaultTableModel[tables.length];
+        sorters = new TableRowSorter[tableModels.length];
 
-            // for search tool
-            searchPanels = new JPanel[tables.length];
-            searchLabels = new JLabel[tables.length];
-            searchFields = new JTextField[tables.length];
-            searchBoxes = new JComboBox[tables.length];
+        // for search tool
+        searchPanels = new JPanel[tables.length];
+        searchLabels = new JLabel[tables.length];
+        searchFields = new JTextField[tables.length];
+        searchBoxes = new JComboBox[tables.length];
 
-            // buttons
-            addButtons = new JButton[tables.length];
-            editButtons = new JButton[tables.length];
-            deleteButtons = new JButton[tables.length];
-            finishButtons = new JButton[tables.length];
+        // buttons
+        addButtons = new JButton[tables.length];
+        editButtons = new JButton[tables.length];
+        deleteButtons = new JButton[tables.length];
+        finishButtons = new JButton[tables.length];
 
-            initComponents();
+        initComponents();
     }
-	
+
     public void initComponents() {
         try {
             con.setAutoCommit(false);
             data = getData(con);
-        }
-        catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -182,24 +167,28 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             editButtons[i] = new JButton("Edit " + tableNames[i]);
             deleteButtons[i] = new JButton("Delete " + tableNames[i]);
             finishButtons[i] = new JButton("Finish");
+            if (i == 1)
+                payButton = new JButton("Pay Fine");
 
             addButtons[i].addActionListener(new AddListener());
             editButtons[i].addActionListener(new EditListener());
             deleteButtons[i].addActionListener(new DeleteListener());
             finishButtons[i].addActionListener(new FinishListener());
+            if (i == 1)
+                payButton.addActionListener(new PayListener());
 
             constraints.gridx = 0;
             constraints.gridy = 0;
             constraints.anchor = GridBagConstraints.CENTER;
-            constraints.gridwidth = 4;
+            constraints.gridwidth = 5;
             panels[i].add(searchPanels[i], constraints);
 
             constraints.gridx = 0;
             constraints.gridy = 1;
             constraints.anchor = GridBagConstraints.CENTER;
-            constraints.gridwidth = 4;
+            constraints.gridwidth = 5;
             panels[i].add(new JScrollPane(tables[i], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), constraints);
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), constraints);
 
             constraints.gridx = 0;
             constraints.gridy = 2;
@@ -219,7 +208,15 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             constraints.gridwidth = 1;
             panels[i].add(deleteButtons[i], constraints);
 
-            constraints.gridx = 3;
+            if (i == 1) {
+                constraints.gridx = 3;
+                constraints.gridy = 2;
+                constraints.anchor = GridBagConstraints.CENTER;
+                constraints.gridwidth = 2;
+                panels[i].add(payButton, constraints);
+            }
+
+            constraints.gridx = 4;
             constraints.gridy = 2;
             constraints.anchor = GridBagConstraints.EAST;
             constraints.gridwidth = 1;
@@ -237,13 +234,15 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
-                int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to exit?", "Exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                
+                int response = JOptionPane.showConfirmDialog(rootPane, "Do you want to exit?", "Exit",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
                 if (response == JOptionPane.YES_OPTION) {
                     try {
                         con.rollback();
                     } catch (SQLException e) {
-                        JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                     createLoginFrame();
                 }
@@ -254,21 +253,20 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
     private Object[][][] getData(Connection con) throws SQLException {
         Object[][][] data = new Object[panels.length][][];
 
-        for (int i = 0; i < data.length; ++i){
+        for (int i = 0; i < data.length; ++i) {
             Statement statement;
             statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             ResultSet rs;
 
-            if (i == 1){
-                rs = statement.executeQuery("SELECT * FROM PATRON WHERE LOGINID NOT IN (SELECT LOGINID FROM LIBRARIAN)");
-            }
-            else if (i == 3){
+            if (i == 1) {
+                rs = statement
+                        .executeQuery("SELECT * FROM PATRON WHERE LOGINID NOT IN (SELECT LOGINID FROM LIBRARIAN)");
+            } else if (i == 3) {
                 rs = statement.executeQuery("SELECT P.LOGINID, FIRSTNAME, MIDDLENAME, LASTNAME, PASSWORD, "
-                + "HOUSENO, STREET, BARANGAY, CITY, UNPAIDFINE, "
-                + "PATRONACCESS, LIBACCESS, BOOKACCESS, TRANSACCESS "
-                + "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
-            }
-            else {
+                        + "HOUSENO, STREET, BARANGAY, CITY, UNPAIDFINE, "
+                        + "PATRONACCESS, LIBACCESS, BOOKACCESS, TRANSACCESS "
+                        + "FROM PATRON P, LIBRARIAN L WHERE P.LOGINID = L.LOGINID");
+            } else {
                 rs = statement.executeQuery("SELECT * FROM " + tableNames[i]);
             }
 
@@ -276,10 +274,10 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             data[i] = new Object[rs.getRow()][];
             rs.beforeFirst();
 
-            for (int j = 0; rs.next(); ++j){
+            for (int j = 0; rs.next(); ++j) {
                 data[i][j] = new Object[columnNames[i].length];
-                for (int k = 0; k < data[i][j].length; ++k){
-                    data[i][j][k] = rs.getString(k+1);
+                for (int k = 0; k < data[i][j].length; ++k) {
+                    data[i][j][k] = rs.getString(k + 1);
                 }
             }
         }
@@ -291,20 +289,22 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         String[] access = new String[tables.length];
         try {
             PreparedStatement preparedStatement = con.prepareStatement(ACCESS_QUERY);
-            preparedStatement.setString(1,loginId);
+            preparedStatement.setString(1, loginId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()){
-                for (int i = 0; i < access.length; ++i){
-                    access[i] = resultSet.getString(i+1);
-                    if (access[i].charAt(0) == '0') addButtons[i].setEnabled(false);
-                    if (access[i].charAt(1) == '0') editButtons[i].setEnabled(false);
-                    if (access[i].charAt(2) == '0') deleteButtons[i].setEnabled(false);
+            if (resultSet.next()) {
+                for (int i = 0; i < access.length; ++i) {
+                    access[i] = resultSet.getString(i + 1);
+                    if (access[i].charAt(0) == '0')
+                        addButtons[i].setEnabled(false);
+                    if (access[i].charAt(1) == '0')
+                        editButtons[i].setEnabled(false);
+                    if (access[i].charAt(2) == '0')
+                        deleteButtons[i].setEnabled(false);
                 }
             }
             resultSet.close();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
-            "SQLException", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -325,8 +325,9 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
     }
 
     private void finishDialog() {
-        Object[] options = {"Save", "Don't Save", "Cancel"};
-        JOptionPane optionPane = new JOptionPane("Do you want to save your changes?", JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options);
+        Object[] options = { "Save", "Don't Save", "Cancel" };
+        JOptionPane optionPane = new JOptionPane("Do you want to save your changes?", JOptionPane.QUESTION_MESSAGE,
+                JOptionPane.OK_CANCEL_OPTION, null, options);
         JDialog dialog = new JDialog(this, "Finish", true);
         dialog.setContentPane(optionPane);
         optionPane.addPropertyChangeListener(new PropertyChangeListener() {
@@ -348,14 +349,102 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                             optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
                             dialog.dispose();
                         }
-                    }
-                    catch (SQLException e) {
-                        JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
-                        "SQLException", JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(rootPane, e.getMessage(), "SQLException",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
         });
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    private class PayListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                createPayDialog();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(rootPane, ex.getMessage(), 
+                "SQLException", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void createPayDialog() throws SQLException {
+        Object[] prompt = new Object[4];
+
+        Vector<String> loginID = singleDistinctQuery(TABLES[1], PATRON_COLUMNS[0]);
+        JComboBox<String> loginIDs = new JComboBox<String>(loginID);
+
+        JTextField amountField = new JTextField();
+
+        String[] fieldNames = new String[]{ "Login ID", "Amount" };
+        Object[] fields = new Object[]{ loginIDs, amountField };
+
+        for (int i = 0, j = 0; i < prompt.length; ++j){
+            prompt[i++] = fieldNames[j];
+            prompt[i++] = fields[j];
+        }
+
+        Object[] options = { "Pay", "Close" };
+
+        JOptionPane optionPane = new JOptionPane(prompt, JOptionPane.PLAIN_MESSAGE, 
+        JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
+
+        JDialog dialog = new JDialog(this, payButton.getText(), true);
+        dialog.setContentPane(optionPane);
+
+        optionPane.addPropertyChangeListener(new PropertyChangeListener(){
+            @Override
+            public void propertyChange(PropertyChangeEvent event) {
+                if (JOptionPane.VALUE_PROPERTY.equals(event.getPropertyName())){
+                    if (optionPane.getValue().equals(options[0])){
+                        optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+                        try {
+                            String[] data = new String[fields.length];
+
+                            data[0] = String.valueOf(((JComboBox<?>)prompt[1]).getSelectedItem());
+
+                            double amount = Double.valueOf(((JTextField)prompt[3]).getText());
+                            amount *= -1;
+                            data[1] = String.valueOf(amount);
+
+                            CallableStatement cs = con.prepareCall("{call update_user_fine(?,?)}");
+
+                            for (int i = 0; i < data.length; ++i){
+                                cs.setString(i + 1, data[i]);
+                            }
+
+                            cs.executeUpdate();
+
+                            Object[][][] dataModels = getData(con);
+                            for (int i = 0; i < tableModels.length; ++i){
+                                tableModels[i].setDataVector(dataModels[i], columnNames[i]);
+                                tableModels[i].fireTableDataChanged();
+                            }
+
+                            JOptionPane.showMessageDialog(rootPane, "Payment Successful!", 
+                            payButton.getText(), JOptionPane.INFORMATION_MESSAGE);
+
+                        } catch (SQLException e) {
+                            JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
+                            "SQLException", JOptionPane.ERROR_MESSAGE);
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(rootPane, e.getMessage(), 
+                            "NumberFormatException", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                    else if (optionPane.getValue().equals(options[1])){
+                        optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+                        dialog.dispose();
+                    }
+                }
+            }
+        });
+
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -427,7 +516,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
             case 3:
 
                 field = new Object[] { 
-                    new JTextField(transactionID), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
+                    new JTextField(userID), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
                     new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
                     new JComboBox<String>(ACCESS_PERMISSIONS), new JComboBox<String>(ACCESS_PERMISSIONS),
                     new JComboBox<String>(ACCESS_PERMISSIONS), new JComboBox<String>(ACCESS_PERMISSIONS) };

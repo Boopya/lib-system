@@ -295,4 +295,40 @@ BEGIN
 END shelf_capacity_trigger;
 /
 
+
+CREATE OR REPLACE TRIGGER transaction_numeric_trigger
+BEFORE INSERT OR UPDATE ON transaction FOR EACH ROW
+BEGIN
+    IF (:NEW.transactionid <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20200,'Invalid transaction ID.');
+    END IF;
+END transaction_numeric_trigger;
+/
+
+
+CREATE OR REPLACE TRIGGER user_numeric_trigger
+BEFORE INSERT OR UPDATE ON patron FOR EACH ROW
+BEGIN
+    IF (:NEW.loginid <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20300,'Invalid login ID.');
+    ELSIF (:NEW.unpaidfine < 0) THEN
+        RAISE_APPLICATION_ERROR(-20400,'Invalid unpaid fine.');
+    END IF;
+END user_numeric_trigger;
+/
+
+
+CREATE OR REPLACE TRIGGER book_numeric_trigger
+BEFORE INSERT OR UPDATE ON book FOR EACH ROW
+BEGIN
+    IF (:NEW.isbn < 1000000000) THEN
+        RAISE_APPLICATION_ERROR(-20500,'Invalid ISBN.');
+    ELSIF (:NEW.copynumber <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20600,'Invalid copy number.');
+    ELSIF (:NEW.publicationyear <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20700,'Invalid publication year.');
+    END IF;
+END book_numeric_trigger;
+/
+
 COMMIT;
