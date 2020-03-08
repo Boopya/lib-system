@@ -250,17 +250,6 @@ END delete_transaction;
 /
 
 
--- LOAN/RETURN/RESERVE HELPER PROCEDURES --
-CREATE OR REPLACE PROCEDURE update_user_penalty (
-    p_loginid patron.loginid%type,
-    p_amount patron.unpaidfine%type ) IS
-BEGIN
-    UPDATE patron SET
-        unpaidfine = unpaidfine + p_amount
-    WHERE loginid = p_loginid;
-END update_user_penalty;
-/
-
 CREATE OR REPLACE PROCEDURE update_book_status (
     p_isbn book.isbn%type,
     p_cpnum book.copynumber%type,
@@ -275,57 +264,71 @@ BEGIN
 END update_book_status;
 /
 
--- LOAN BOOK PROCEDURE --
-/*
-    - add a transaction instance with 'LOAN' transactionmode
-    - update the current status of the loaned book into 'ON-LOAN' status
-    NOTE: no implemented exceptions for special cases
-*/
-CREATE OR REPLACE PROCEDURE loan_book (
-    p_transid transaction.transactionid%type,
-    p_transdate transaction.transactiondate%type,
-    p_transmode transaction.transactionmode%type,
-    p_loginid transaction.patron_loginid%type,
-    p_isbn transaction.book_isbn%type,
-    p_cpnum transaction.book_copynumber%type ) IS
+
+CREATE OR REPLACE PROCEDURE update_user_fine (
+    p_loginid patron.loginid%type,
+    p_amount patron.unpaidfine%type ) IS
 BEGIN
-    add_transaction(p_transid,p_transdate,'LOAN',p_loginid,p_isbn,p_cpnum);
-    update_book_status(p_isbn,p_cpnum,'ON-LOAN',p_transdate);
-END loan_book;
+    UPDATE patron SET
+        unpaidfine = unpaidfine + p_amount
+    WHERE loginid = p_loginid;
+END update_user_fine;
 /
 
--- RETURN BOOK PROCEDURE --
-/*
-    - add a transaction instance with 'RETURN' transactionmode
-    - determine the loan interval of the user
-    - update the unpaidfine by incrementing the computed penaltycost
-    NOTE: no implemented exceptions for special cases
-*/
-CREATE OR REPLACE PROCEDURE return_book (
-    p_transid transaction.transactionid%type,
-    p_transdate transaction.transactiondate%type,
-    p_transmode transaction.transactionmode%type,
-    p_loginid transaction.patron_loginid%type,
-    p_isbn transaction.book_isbn%type,
-    p_cpnum transaction.book_copynumber%type ) IS
-    
-l_loaninterval number;
-l_penaltycost patron.unpaidfine%type := 0;
 
+CREATE OR REPLACE TRIGGER shelf_capacity_trigger
+BEFORE INSERT ON book FOR EACH ROW
+DECLARE
+v_books shelf.capacity%TYPE := 0;
+v_capacity shelf.capacity%TYPE := 0;
 BEGIN
-    add_transaction(p_transid,p_transdate,'RETURN',p_loginid,p_isbn,p_cpnum);
-    
-    SELECT p_transdate - statusdate INTO l_loaninterval FROM book
-        WHERE isbn = p_isbn AND copynumber = p_cpnum;
-    
-    if (l_loaninterval > 7) THEN
-        l_loaninterval := l_loaninterval - 7;
-        l_penaltycost := l_loaninterval * 20;
-        update_user_penalty(p_loginid,l_penaltycost);
+    SELECT COUNT(isbn) INTO v_books FROM book 
+    WHERE shelf_shelfid = :NEW.shelf_shelfid;
+
+    SELECT capacity INTO v_capacity FROM shelf
+    WHERE shelfid = :NEW.shelf_shelfid;
+
+    IF (v_books >= v_capacity) THEN
+        RAISE_APPLICATION_ERROR(-20100,'The shelf is at the maximum capacity.');
     END IF;
-    
-    update_book_status(p_isbn,p_cpnum,'ON-SHELF',p_transdate);
-END return_book;
+
+END shelf_capacity_trigger;
+/
+
+
+CREATE OR REPLACE TRIGGER transaction_numeric_trigger
+BEFORE INSERT OR UPDATE ON transaction FOR EACH ROW
+BEGIN
+    IF (:NEW.transactionid <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20200,'Invalid transaction ID.');
+    END IF;
+END transaction_numeric_trigger;
+/
+
+
+CREATE OR REPLACE TRIGGER user_numeric_trigger
+BEFORE INSERT OR UPDATE ON patron FOR EACH ROW
+BEGIN
+    IF (:NEW.loginid <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20300,'Invalid login ID.');
+    ELSIF (:NEW.unpaidfine < 0) THEN
+        RAISE_APPLICATION_ERROR(-20400,'Invalid unpaid fine.');
+    END IF;
+END user_numeric_trigger;
+/
+
+
+CREATE OR REPLACE TRIGGER book_numeric_trigger
+BEFORE INSERT OR UPDATE ON book FOR EACH ROW
+BEGIN
+    IF (:NEW.isbn < 1000000000) THEN
+        RAISE_APPLICATION_ERROR(-20500,'Invalid ISBN.');
+    ELSIF (:NEW.copynumber <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20600,'Invalid copy number.');
+    ELSIF (:NEW.publicationyear <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20700,'Invalid publication year.');
+    END IF;
+END book_numeric_trigger;
 /
 
 COMMIT;

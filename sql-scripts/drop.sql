@@ -6,6 +6,7 @@ drop table author purge;
 drop table shelf purge;
 drop table librarian purge;
 drop table patron purge;
-drop sequence patron_id;
+drop sequence patron_id_seq;
+drop sequence transaction_id_seq;
 
 COMMIT;
