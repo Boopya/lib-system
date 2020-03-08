@@ -478,7 +478,7 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
         String userID = null;
         String transactionID = null;
         Statement statement = con.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT PATRON_ID_SEQ.NEXTVAL, TRANSACTION_ID_SEQ.NEXTVAL FROM PATRON");
+        ResultSet resultSet = statement.executeQuery("SELECT PATRON_ID_SEQ.CURRVAL, TRANSACTION_ID_SEQ.CURRVAL FROM DUAL");
         if (resultSet.next()){
             userID = resultSet.getString(1);
             transactionID = resultSet.getString(2);
@@ -486,11 +486,15 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
         switch (table) {
             case 0:
+
                 Vector<String> loginID = singleDistinctQuery(TABLES[1], PATRON_COLUMNS[0]);
                 Vector<String> isbn = singleDistinctQuery(TABLES[2], BOOK_COLUMNS[0]);
                 Vector<String> copyNumber = singleDistinctQuery(TABLES[2], BOOK_COLUMNS[1]);
 
-                field = new Object[] { new JTextField(transactionID), dateSpinner,
+                JTextField transactionField = new JTextField(transactionID);
+                transactionField.setEditable(false);
+
+                field = new Object[] { transactionField, dateSpinner,
                     new JComboBox<String>(TRANSACTION_MODE), new JComboBox<String>(loginID), 
                     new JComboBox<String>(isbn), new JComboBox<String>(copyNumber) };
 
@@ -498,7 +502,10 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
             case 1:
 
-                field = new Object[] { new JTextField(userID), new JTextField(), new JTextField(), 
+                JTextField patronField = new JTextField(userID);
+                patronField.setEditable(false);
+
+                field = new Object[] { patronField, new JTextField(), new JTextField(), 
                     new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
                     new JTextField(), new JTextField(), new JTextField() };
 
@@ -515,8 +522,11 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
 
             case 3:
 
+                JTextField librarianField = new JTextField(userID);
+                librarianField.setEditable(false);
+
                 field = new Object[] { 
-                    new JTextField(userID), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
+                    librarianField, new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
                     new JTextField(), new JTextField(), new JTextField(), new JTextField(), new JTextField(), 
                     new JComboBox<String>(ACCESS_PERMISSIONS), new JComboBox<String>(ACCESS_PERMISSIONS),
                     new JComboBox<String>(ACCESS_PERMISSIONS), new JComboBox<String>(ACCESS_PERMISSIONS) };
@@ -623,6 +633,14 @@ public class LibrarianFrame extends JFrame implements SQLStatements {
                             }
 
                             cs.executeUpdate();
+
+                            Statement statement = con.createStatement();
+                            if (table == 0){
+                                statement.executeQuery("SELECT TRANSACTION_ID_SEQ.NEXTVAL FROM DUAL");
+                            }
+                            else if (table == 1 || table == 3){
+                                statement.executeQuery("SELECT PATRON_ID_SEQ.NEXTVAL FROM DUAL");
+                            }
 
                             Object[][][] dataModels = getData(con);
                             for (int i = 0; i < tableModels.length; ++i){

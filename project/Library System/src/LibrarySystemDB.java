@@ -1,6 +1,7 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -17,6 +18,9 @@ public class LibrarySystemDB implements AccessCredentials{
             
             // connection checker
             System.out.println("Connected successfully.");
+
+            Statement statement = con.createStatement();
+            statement.executeQuery("SELECT PATRON_ID_SEQ.NEXTVAL, TRANSACTION_ID_SEQ.NEXTVAL FROM DUAL");
 
             loginFrame = new LoginFrame(con);
 

@@ -456,9 +456,10 @@ public class PatronFrame extends JFrame implements SQLStatements {
                     calendar.set(Calendar.SECOND, 0);
                     String dateStr = DATEFORMAT.format(calendar.getTime());
 
-                    String transactionSeq = null;
                     Statement statement = con.createStatement();
-                    ResultSet resultSet = statement.executeQuery("SELECT TRANSACTION_ID_SEQ.NEXTVAL FROM PATRON");
+                    ResultSet resultSet = statement.executeQuery("SELECT TRANSACTION_ID_SEQ.CURRVAL FROM DUAL");
+
+                    String transactionSeq = null;
                     if (resultSet.next()){
                         transactionSeq = resultSet.getString(1);
                     }
@@ -480,6 +481,8 @@ public class PatronFrame extends JFrame implements SQLStatements {
                     }
 
                     cs.executeUpdate();
+
+                    statement.executeQuery("SELECT TRANSACTION_ID_SEQ.NEXTVAL FROM DUAL");
                 }
 
                 Object[][][] dataModels = getData(con);
