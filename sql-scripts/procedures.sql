@@ -250,113 +250,85 @@ END delete_transaction;
 /
 
 
-CREATE OR REPLACE TRIGGER transaction_trigger
-BEFORE INSERT OR UPDATE ON transaction
-FOR EACH ROW
-DECLARE
-v_status book.currentstatus%TYPE;
-v_status_date book.statusdate%TYPE;
-v_loginid transaction.patron_loginid%TYPE;
-v_loan_count number;
-v_return_count number;
-v_pending_count number;
-v_reserve_count number;
-v_loan_interval number;
-v_penalty_fee patron.unpaidfine%TYPE;
+CREATE OR REPLACE PROCEDURE update_book_status (
+    p_isbn book.isbn%type,
+    p_cpnum book.copynumber%type,
+    p_curstatus book.currentstatus%type,
+    p_statusdate book.statusdate%type ) IS
 BEGIN
-    IF (:NEW.transactionmode = 'LOAN') THEN
-        SELECT currentstatus, statusdate INTO v_status, v_status_date FROM book
-        WHERE isbn = :NEW.book_isbn AND copynumber = :NEW.book_copynumber;
-        
-        SELECT patron_loginid INTO v_loginid FROM transaction
-        WHERE transactionmode = 'RESERVE' AND transactiondate = v_status_date;
-        
-        SELECT COUNT(transactionid) INTO v_loan_count FROM transaction
-        WHERE patron_loginid = :NEW.patron_loginid AND (:NEW.transactiondate - transactiondate) <= 7 AND transactionmode = 'LOAN';
-        
-        SELECT COUNT(transactionid) INTO v_return_count FROM transaction
-        WHERE patron_loginid = :NEW.patron_loginid AND (:NEW.transactiondate - transactiondate) <= 7 AND transactionmode = 'RETURN';
-        
-        v_pending_count := v_loan_count - v_return_count;
-        
-        IF (v_status = 'ON-LOAN') THEN
-            RAISE_APPLICATION_ERROR(-20100,'The book is already loaned.');
-        ELSIF (v_status = 'ON-HOLD' AND (:NEW.transactiondate - v_status_date) <= 7 AND v_loginid != :NEW.patron_loginid) THEN
-            RAISE_APPLICATION_ERROR(-20200,'The book is reserved to another patron.');
-        ELSIF (v_pending_count >= 2) THEN
-            RAISE_APPLICATION_ERROR(-20300,'You have reached maximum reserved/loaned books.');
-        END IF;
-        
-        UPDATE book SET
-            currentstatus = 'ON-LOAN',
-            statusdate = :NEW.transactiondate
-        WHERE isbn = :NEW.book_isbn AND copynumber = :NEW.book_copynumber;
-        
-    ELSIF (:NEW.transactionmode = 'RETURN') THEN
-        SELECT currentstatus, statusdate INTO v_status, v_status_date FROM book
-        WHERE isbn = :NEW.book_isbn AND copynumber = :NEW.book_copynumber;
-        
-        SELECT patron_loginid INTO v_loginid FROM transaction
-        WHERE transactionmode = 'LOAN' AND transactiondate = v_status_date 
-        AND book_isbn = :NEW.book_isbn AND book_copynumber = :NEW.book_copynumber;
-        
-        IF (v_status != 'ON-LOAN') THEN
-            RAISE_APPLICATION_ERROR(-20400,'The book is already returned.');
-        ELSIF (:NEW.patron_loginid != v_loginid) THEN
-            RAISE_APPLICATION_ERROR(-20500,'You cannot return a book that has been loaned by another patron.');
-        END IF;
-        
-        v_loan_interval := :NEW.transactiondate - v_status_date;
-        
-        IF (v_loan_interval > 7) THEN
-            v_loan_interval := v_loan_interval - 7;
-            v_penalty_fee := v_loan_interval * 20;
-            
-            UPDATE patron SET
-                unpaidfine = unpaidfine + v_penalty_fee
-            WHERE loginid = :NEW.patron_loginid;
-            
-        END IF;
-        
-        UPDATE book SET
-            currentstatus = 'ON-SHELF',
-            statusdate = :NEW.transactiondate
-        WHERE isbn = :NEW.book_isbn AND copynumber = :NEW.book_copynumber;
-        
-    ELSIF (:NEW.transactionmode = 'RESERVE') THEN
-        SELECT currentstatus INTO v_status FROM book
-        WHERE isbn = :NEW.book_isbn AND copynumber = :NEW.book_copynumber;
-        
-         SELECT COUNT(transactionid) INTO v_loan_count FROM transaction
-        WHERE patron_loginid = :NEW.patron_loginid AND (:NEW.transactiondate - transactiondate) <= 7 AND transactionmode = 'LOAN';
-        
-        SELECT COUNT(transactionid) INTO v_return_count FROM transaction
-        WHERE patron_loginid = :NEW.patron_loginid AND (:NEW.transactiondate - transactiondate) <= 7 AND transactionmode = 'RETURN';
-        
-        SELECT COUNT(transactionid) INTO v_reserve_count FROM transaction
-        WHERE patron_loginid = :NEW.patron_loginid AND (:NEW.transactiondate - transactiondate) <= 7 AND transactionmode = 'RESERVE';
-        
-        IF ((v_reserve_count - v_loan_count) < 0) THEN
-            v_reserve_count := 0;
-        ELSE 
-            v_reserve_count := v_reserve_count - v_loan_count;
-        END IF;
-        
-        v_pending_count := (v_loan_count - v_return_count) + v_reserve_count;
-        
-        IF (v_status != 'ON-SHELF') THEN
-            RAISE_APPLICATION_ERROR(-20600,'The book is not available for reserve.');
-        ELSIF (v_pending_count >= 2) THEN
-            RAISE_APPLICATION_ERROR(-20700,'You have reached maximum reserved/loaned books.');
-        END IF;
-        
-        UPDATE book SET
-            currentstatus = 'ON-HOLD',
-            statusdate = :NEW.transactiondate
-        WHERE isbn = :NEW.book_isbn AND copynumber = :NEW.book_copynumber;
-        
+    UPDATE book SET
+        currentstatus = p_curstatus,
+        statusdate = p_statusdate
+    WHERE isbn = p_isbn AND 
+          copynumber = p_cpnum;
+END update_book_status;
+/
+
+
+CREATE OR REPLACE PROCEDURE update_user_fine (
+    p_loginid patron.loginid%type,
+    p_amount patron.unpaidfine%type ) IS
+BEGIN
+    UPDATE patron SET
+        unpaidfine = unpaidfine + p_amount
+    WHERE loginid = p_loginid;
+END update_user_fine;
+/
+
+
+CREATE OR REPLACE TRIGGER shelf_capacity_trigger
+BEFORE INSERT ON book FOR EACH ROW
+DECLARE
+v_books shelf.capacity%TYPE := 0;
+v_capacity shelf.capacity%TYPE := 0;
+BEGIN
+    SELECT COUNT(isbn) INTO v_books FROM book 
+    WHERE shelf_shelfid = :NEW.shelf_shelfid;
+
+    SELECT capacity INTO v_capacity FROM shelf
+    WHERE shelfid = :NEW.shelf_shelfid;
+
+    IF (v_books >= v_capacity) THEN
+        RAISE_APPLICATION_ERROR(-20100,'The shelf is at the maximum capacity.');
     END IF;
-END loan_trigger;
+
+END shelf_capacity_trigger;
+/
+
+
+CREATE OR REPLACE TRIGGER transaction_numeric_trigger
+BEFORE INSERT OR UPDATE ON transaction FOR EACH ROW
+BEGIN
+    IF (:NEW.transactionid <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20200,'Invalid transaction ID.');
+    END IF;
+END transaction_numeric_trigger;
+/
+
+
+CREATE OR REPLACE TRIGGER user_numeric_trigger
+BEFORE INSERT OR UPDATE ON patron FOR EACH ROW
+BEGIN
+    IF (:NEW.loginid <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20300,'Invalid login ID.');
+    ELSIF (:NEW.unpaidfine < 0) THEN
+        RAISE_APPLICATION_ERROR(-20400,'Invalid unpaid fine.');
+    END IF;
+END user_numeric_trigger;
+/
+
+
+CREATE OR REPLACE TRIGGER book_numeric_trigger
+BEFORE INSERT OR UPDATE ON book FOR EACH ROW
+BEGIN
+    IF (:NEW.isbn < 1000000000) THEN
+        RAISE_APPLICATION_ERROR(-20500,'Invalid ISBN.');
+    ELSIF (:NEW.copynumber <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20600,'Invalid copy number.');
+    ELSIF (:NEW.publicationyear <= 0) THEN
+        RAISE_APPLICATION_ERROR(-20700,'Invalid publication year.');
+    END IF;
+END book_numeric_trigger;
 /
 
 COMMIT;

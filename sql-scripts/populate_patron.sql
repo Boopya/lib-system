@@ -1,13 +1,20 @@
 -- create a sequence for patron login id
-CREATE SEQUENCE patron_id
+CREATE SEQUENCE patron_id_seq
     INCREMENT BY 1
     START WITH 201800001
     NOCYCLE
     NOCACHE;
 
+-- create a sequence fro transaction id
+CREATE SEQUENCE transaction_id_seq
+    INCREMENT BY 1
+    START WITH 1
+    NOCYCLE
+    NOCACHE;
+
 -- 1
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Rajan',            -- first name
     'Nanini',           -- middle name
     'Elio',             -- last name
@@ -21,7 +28,7 @@ INSERT INTO PATRON VALUES (
 
 -- 2
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'James',            -- first name
     'Ohana',            -- middle name
     'De Leon',          -- last name
@@ -35,7 +42,7 @@ INSERT INTO PATRON VALUES (
 
 -- 3
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Mark',             -- first name
     'Moses',            -- middle name
     'Egana',            -- last name
@@ -49,7 +56,7 @@ INSERT INTO PATRON VALUES (
 
 -- 4
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Kendrew',          -- first name
     'Yap',              -- middle name
     'Javelosa',         -- last name
@@ -63,7 +70,7 @@ INSERT INTO PATRON VALUES (
 
 -- 5
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Rikiya',           -- first name
     'Eduarte',          -- middle name
     'Yamazaki',         -- last name
@@ -77,7 +84,7 @@ INSERT INTO PATRON VALUES (
 
 -- 6
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Carl James',       -- first name
     'Manuelito',        -- middle name
     'Rebloriza',        -- last name
@@ -91,7 +98,7 @@ INSERT INTO PATRON VALUES (
 
 -- 7
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Albert',           -- first name
     'Joshy',            -- middle name
     'Dizon',            -- last name
@@ -105,7 +112,7 @@ INSERT INTO PATRON VALUES (
 
 -- 8
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Jotaro',           -- first name
     'Zawarudo',         -- middle name
     'Kujo',             -- last name
@@ -119,7 +126,7 @@ INSERT INTO PATRON VALUES (
 
 -- 9
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Koichi',           -- first name
     'Echoes',           -- middle name
     'Hirose',           -- last name
@@ -133,7 +140,7 @@ INSERT INTO PATRON VALUES (
 
 -- 10
 INSERT INTO PATRON VALUES (
-    patron_id.NEXTVAL,  -- patron login id
+    patron_id_seq.NEXTVAL,  -- patron login id
     'Josuke',           -- first name
     'Puratinun',        -- middle name
     'Higashikata',      -- last name
